@@ -10,6 +10,7 @@ func main() {
 	fmt.Println("123456")              //123456
 	fmt.Println("hello", "world", "!") //hello world !
 
+	//使用Printf函数输出格式化的输出
 	//如何调整输出的对齐格式
 	//使用%后跟数字跟v的方式，中间的数字就表示这个占位符的长度（中文的话按每个字按两个字符算），正数表示靠右对齐，复数表示靠左对齐
 	fmt.Printf("%-15v %6v\n", "abcdefghijklmno", "123")
