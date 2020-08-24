@@ -36,8 +36,8 @@ switch {
 1. 常见的for循环
 ```
 for i := 0; i < 10; i++ {
-		fmt.Println(i)
-	}
+    fmt.Println(i)
+}
 ```
 
 2. 类似while的for循环
