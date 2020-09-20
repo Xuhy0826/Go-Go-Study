@@ -43,4 +43,20 @@ func main() {
 	//解决方案
 	fmt.Println(math.Abs(piggyBank-0.3) < 0.0001) //true
 
+	/*****************************骄傲的分割线*********************************/
+	//Go会默认将整数推断成int类型
+	days := 365
+	fmt.Printf("Type %T for %[1]v\n", days) //Type int for 365
+
+	/* 使用uint8来表示颜色rgb值，是个很好的选择：
+	 * （1）能将变量限制在合法的范围之内
+	 * （2）对于未压缩的图片这种需要按顺序存储大量颜色的场景，可以极大的节省空间
+	 */
+	var red, green, blue uint8 = 0, 141, 213
+	fmt.Printf("color：#%02x%02x%02x;\n", red, green, blue) //color：#008dd5;
+
+	//注意“整型环绕”
+	var numberA uint8 = 255 //到达类型最大值
+	numberA++
+	fmt.Println(numberA) //0	环绕
 }
