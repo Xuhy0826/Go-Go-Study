@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math"
+	"math/big"
 )
 
 func main() {
@@ -59,4 +60,21 @@ func main() {
 	var numberA uint8 = 255 //到达类型最大值
 	numberA++
 	fmt.Println(numberA) //0	环绕
+
+	//使用大数：就是特别大的数
+	var distance int64 = 41.3e12 //就是41.3 * 10的12次方
+	fmt.Println("distance is ", distance)
+
+	//使用“大数”类型的方法1
+	lightSpeed := big.NewInt(299792)
+	fmt.Println("distance is ", lightSpeed)
+
+	//使用“大数”类型的方法2
+	distance1 := new(big.Int)
+	distance1.SetString("24000000000000000000000", 10)
+	fmt.Println("distance1 is ", distance1)
+
+	//使用常量来承载很大的数不会引发溢出异常，并且可以正常使用
+	const distanceConst = 240000000000000000000000
+	fmt.Println("Andromeda Galaxy is ", distanceConst/299792/86400)
 }

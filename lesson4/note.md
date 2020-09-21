@@ -1,4 +1,4 @@
-# 基本类型
+# 基本类型之数值类型
 
 ## 实数
 
@@ -36,9 +36,13 @@ piggyBank += 0.2
 fmt.Println(piggyBank) //0.30000000000000004
 ```
 由上面提到的浮点类型的精确度问题，就会导致浮点数的比较
-```fmt.Println(piggyBank == 0.3) //false```
+```
+fmt.Println(piggyBank == 0.3) //false
+```
 一个折中的解决方案就是使用一定精确度来判断是否相等
-```fmt.Println(math.Abs(piggyBank-0.3) < 0.0001) //true```
+```
+fmt.Println(math.Abs(piggyBank-0.3) < 0.0001) //true
+```
 
 那么说到底，避免浮点数精确度问题的最佳方案就是：不使用浮点数
 
@@ -70,4 +74,35 @@ fmt.Printf("color：#%02x%02x%02x;", red, green, blue) //color：#008dd5;
 var numberA uint8 = 255	//到达类型最大值
 numberA++
 fmt.Println(numberA)	//0	环绕
+```
+## 大数
+顾名思义，就是特别大的数，一般情况下，比较大的数我们也可使用简便写法
+表示方法（类似科学计数法）：
+```
+var distance int64 = 41.3e12    //就是41.3 * 10<sup>12</sup>
+```
+但是如果需要使用超过uint64上限的数时，Go为我们提供了big包来解决问题，引用时包名为："math/big"。
+
+### big包
+* 存储大整数：big.Int
+* 存储任意精度的浮点数：big.Float
+* 存储如1/3的分数：big.Rat
+
+#### big.Int的创建方式有两种
+1. 使用big.NewInt(int val)的方法
+```
+lightSpeed := big.NewInt(299792)
+```
+2. 使用big.SetString(string val, 10)的方法
+```
+distance := new(big.Int)
+distance.SetString("24000000000000000000000", 10)
+```
+大数类型可以精确地承载很大的数值，但是代价就是空间和性能的损耗。
+
+### 大数在常量中的表现
+和变量不同，当我们不为常量指定类型，并直接为其赋值一个很大的数，Go会直接将其标记为无类型（untyped）而不会引发溢出异常，并且可以在程序中正常使用
+```
+const distance = 240000000000000000000000
+fmt.Println("Andromeda Galaxy is ", distance/299792/86400)
 ```
