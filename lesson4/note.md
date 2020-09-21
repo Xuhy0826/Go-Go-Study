@@ -93,7 +93,7 @@ var distance int64 = 41.3e12    //就是41.3 * 10<sup>12</sup>
 ```
 lightSpeed := big.NewInt(299792)
 ```
-2. 使用big.SetString(string val, 10)的方法
+2. 使用big.SetString(string val, 10)的方法，其中“10”表示参数1这个字符串是个10进制的数
 ```
 distance := new(big.Int)
 distance.SetString("24000000000000000000000", 10)
