@@ -1,5 +1,8 @@
 # Hello World
 
+关于如何安装Go，开发环境等等就不赘述了，教程很多  
+本次主要是尝鲜，小试一下Go中的一些语法
+
 1. 引入包：import 包名
 2. 几种输出方法：fmt.Println(), fmt.Print(), fmt.Printf(),
 3. Go和其他语言一样，都有一个main函数入口

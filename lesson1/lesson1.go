@@ -6,6 +6,7 @@ import "fmt"
 
 //声明main函数，注意Go中的大括号方式只支持这一种形式
 func main() {
+
 	//Println功能有点类似js中console.log方法
 	fmt.Println("123456")              //123456
 	fmt.Println("hello", "world", "!") //hello world !
