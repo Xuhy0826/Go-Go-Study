@@ -13,14 +13,14 @@
 如果多个参数的函数参数类型相同，可以简写
 > func Unix(sec, nsec int64) Time
 
-* 多返回值形式   
+* 多返回值形式
 在之前遇到的函数“countdown, err := strconv.Atoi("10")”就是一种多返回值的函数，其声明的写法是
 > func Atoi(s string) (i int, err error)  
 
 简写：返回值可以将名字去掉只保留类型：
 > func Atoi(s string) (int, error)
 
-* 可变参数函数   
+* 可变参数函数
 例如常用的Println函数，它可以接收一个参数、两个参数或更多参数。并且它可以接收不同类型的参数
 ```
 fmt.Println("Hello","World")
@@ -29,8 +29,9 @@ fmt.Println(186, "seconds")
 其函数声明如下：
 > func Println(a ...interface{}) (n int, err error)
 1. ...表示函数的参数的数量是可变的
-2. 参数a的类型为interface{}，是一个空接口。空接口可以接收所有类型   
-所以，...和interface{}结合到一起，就可以接收任意数量任意类型的参数   
+2. 参数a的类型为interface{}，是一个空接口。空接口可以接收所有类型
+> 所以，...和interface{}结合到一起，就可以接收任意数量任意类型的参数
+
 * 最后写个例子
 ```
 package main
