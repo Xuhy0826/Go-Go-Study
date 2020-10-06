@@ -42,4 +42,9 @@ func main() {
 	}
 	fmt.Println(count) //10
 
+	//bool转string
+	launch := false
+	launchText := fmt.Sprintf("%v", launch)
+	fmt.Println("Ready for launch:", launchText) //Ready for launch: false
+
 }

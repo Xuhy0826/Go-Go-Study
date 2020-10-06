@@ -9,6 +9,7 @@ age := 41
 marsAge := float64(age)
 ```
 * 浮点类型 → 整数类型：
+【注意】浮点型的小数部分是被截断，而不是四舍五入
 ```
 fmt.Println(int(earthDays))
 ```
@@ -42,3 +43,12 @@ if err != nil {
 }
 fmt.Println(count) //10
 ```
+
+## 布尔类型转换
+如果使用Print系函数直接打印bool类型，会输出true或false的文本
+```
+launch := false
+launchText := fmt.Sprintf("%v", launch)
+fmt.Println("Ready for launch:", launchText) //Ready for launch: false
+```
+某些语言中会把1和0当做true和false，Go中是不行的。
