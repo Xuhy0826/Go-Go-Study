@@ -66,6 +66,7 @@ func (k kelvin) celsius() celsius{
 ```
 这里的k称为接收者（receiver），每个方法可以有多个参数，但是只能有一个接收者。   
 ![方法声明][methodDeclareStr]
+
 在声明好方法之后，类型kelvin就可以直接调用方法了，用起来就和在类中定义了方法很类似。
 ```
 var k kelvin = 294.0
