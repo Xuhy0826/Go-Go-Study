@@ -16,17 +16,17 @@ func main() {
 	//使用Printf函数输出格式化的输出
 	//如何调整输出的对齐格式
 	//使用%后跟数字跟v的方式，中间的数字就表示这个占位符的长度（中文的话按每个字按两个字符算），正数表示靠右对齐，复数表示靠左对齐
-	fmt.Printf("%-15v %6v\n", "abcdefghijklmno", "123")
-	fmt.Printf("%-15v %6v\n", "abcdefg", "123456")
-	fmt.Printf("%-15v %6v\n", "一二三四五六七八九", "123456")
+	fmt.Printf("%-15v %6v\n", "abcdefghijklmno", "123") //abcdefghijklmno    123
+	fmt.Printf("%-15v %6v\n", "abcdefg", "123456")      //abcdefg         123456
+	fmt.Printf("%-15v %6v\n", "一二三四五六七八九", "123456")    //一二三四五六七八九       123456
 
 	//const声明常量，var声明变量，没什么特别之处
 	const width = 10
 	var height = 5
 	var distance, speed = 5600000, 10080
 
-	fmt.Println("area = ", width*height)
-	fmt.Println("time = ", distance/speed)
+	fmt.Println("area = ", width*height)   //area =  50
+	fmt.Println("time = ", distance/speed) //time =  555
 
 	fmt.Println(add(10, 2))             //12
 	fmt.Println(reverse("a", "b", "c")) //c b a
