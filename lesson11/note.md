@@ -38,3 +38,81 @@ iceGiants[1] = "Poseidon"
 fmt.Println(iceGiantsMarkII) //[Uranus Poseidon] 发生了变化
 fmt.Println(ice)             //[Uranus Poseidon]
 ```
+切片也有简写模式，也就是利用切片的默认值，array[:3]表示从开头切到index为3的地方，array[4:]表示index为4的元素一直切到最后，array[:]表示数组的所有元素了。
+```
+planets := [...]string{
+    "Mercury",
+    "Venus",
+    "Earth",
+    "Mars",
+    "Jupiter",
+    "Saturn",
+    "Uranus",
+    "Neptune",
+}
+fmt.Println(slice1) //[Mercury Venus Earth]
+fmt.Println(slice2) //[Jupiter Saturn Uranus Poseidon]
+fmt.Println(slice3) //[Mercury Venus Earth Mars Jupiter Saturn Uranus Poseidon]
+```
+另外值得一提的是字符串也可以这么玩
+```
+neptune := "Neptune"
+tune := neptune[3:]
+fmt.Println(tune) //tune
+```
+切分字符串时，索引是按照字节号码而不是符文号码
+```
+question := "你在学习Go吗？"
+fmt.Println(question[:6]) //你在
+```
+Go语言中，函数更加倾向于使用切片作为输入。除了切分数组，另外一个创建切片的简便方法是使用 **切片的复合字面量**
+```
+dwarfs := []string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris"}
+fmt.Printf("%T", dwarfs) //[]string
+```
+将切片作为参数传入函数，Go的函数是按值传递，传入的是一个完整副本，但是这两个切片都是指向同一个底层数组的，所以在函数中所做的改动会影响到原数组和其他切片。
+```
+import (
+	"fmt"
+	"strings"
+)
+
+//遍历切片，消除空格
+func hyperspace(worlds []string) {
+	for i := range worlds {
+		worlds[i] = strings.TrimSpace(worlds[i])
+	}
+}
+
+func main() {
+    countries := []string{" China ", "  Japan", " USA"}
+	hyperspace(countries)
+	fmt.Println(strings.Join(countries, "")) //[]stringChinaJapanUSA
+}
+```
+## 带有方法的切片
+可以使用切片或者数组作为底层类型声明类型，并为其绑定方法。比如标准库sort包声明了一种StringSlice的类型：
+```
+type StringSlice []string
+```
+并且为其关联了方法：可按照字母进行排序
+```
+func (p StringSlice) Sort()
+```
+【示例】
+```
+import (
+	"fmt"
+	"sort"
+	"strings"
+)
+
+func main() {
+    //使用sort方法
+	sort.StringSlice(dwarfs).Sort()
+	fmt.Println(dwarfs) //[Ceres Eris Haumea Makemake Pluto]
+
+	//简化上面的操作，自动执行类型转换和排序
+	sort.Strings(dwarfs)
+}
+```
