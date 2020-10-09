@@ -39,4 +39,5 @@ func main() {
 	fmt.Println(iceGiantsMarkII) //[Uranus Poseidon] 发生了变化
 	fmt.Println(ice)             //[Uranus Poseidon]
 
+	//切片可以简写，利用默认值
 }
