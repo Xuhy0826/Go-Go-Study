@@ -1,4 +1,4 @@
-//lesson3：变量作用域
+//lesson03：变量作用域
 package main
 
 import (
