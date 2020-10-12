@@ -1,0 +1,96 @@
+# 映射：map
+
+一种键值对类型，并且键和值都可以是任意的类型。Go语言中的map类型其实和C#，python中的字典基本一致。
+
+## map的声明
+
+举个例子，下面声明一个键（key）为string类型，值（value）为int类型的map。
+> **map[string]int**
+
+对map的读写操作和其他语言中的字典操作很类似，简单过一下
+```
+//声明map，使用复合字面量的声明方式
+temperature := map[string]int{
+    "Mars":  -65,
+    "Earth": 15,
+}
+//读
+temp := temperature["Earth"]
+fmt.Printf("On avarage the Earth is %v C \n", temp) //On avarage the Earth is 15 C
+
+//写
+temperature["Mars"] = 16
+temperature["Vemus"] = 464
+
+fmt.Println(temperature) //map[Earth:15 Mars:16 Vemus:464]
+
+//如果访问不存在的键，则反映值类型的零值
+fmt.Println(temperature["Moon"]) //0
+```
+Go语言中提供了一种 **“逗号与ok”**（名字有点诡异）的写法来简化代码语法，看例子
+```
+if moon, ok := temperature["Moon"]; ok {
+    fmt.Printf("On avarage the Earth is %v C \n", moon)
+} else {
+    fmt.Println("Where is the moon?")
+}
+```
+应该很容易理解，ok（可以使用其他参数名）在这里是个bool类型，若map中存在此键，则ok为true，反之为false。这种语法简化了我们在其他语言中还要去手动调用ContainKey()方法的语法。
+
+## map是不会被复制的
+
+之前的基本类型与数组不同，在被赋值给新的变量或者传递给函数或方法时都会创建新的副本。而map则不同，不管是赋值还是当做函数的参数，都是会共享底层数据的。看例子
+```
+planets := map[string]string{
+    "Earth": "Sector ZZ9",
+    "Mars":  "Sector ZZ9",
+}
+planetsMarkII := planets
+planets["Earth"] = "Whoops"
+fmt.Println(planets)       //map[Earth:Whoops Mars:Sector ZZ9]
+fmt.Println(planetsMarkII) //map[Earth:Whoops Mars:Sector ZZ9]
+```
+planets改变，相应的planetsMarkII也是改变的，因为它们指向同一块内存。
+* 使用delete方法可以删除map中的元素，例子接上
+```
+delete(planets, "Earth")
+delete(planets, "Moon")    //移除不存在的元素，不会引发panic
+fmt.Println(planets)       //map[Mars:Sector ZZ9]
+fmt.Println(planetsMarkII) //map[Mars:Sector ZZ9]
+```
+
+## 使用make函数对map进行预分配
+声明map有两种方法，一种是之前用过的复合字面量，另一种就是使用make函数。make函数可以接收一个或两个参数，第二个参数用于指定键的数量来预分配空间。看实例。
+```
+temperature := make(map[float64]int, 8)
+```
+为map指定出事大小能够在map变大时减少一些后续操作。
+
+## 使用映射和切片实现数据分组
+看实例吧，就是将map和切片的一个综合应用。
+```
+temperatures := []float64{
+    -28.0, 32.0, -31.0, -29.0, -23.0, -28.0, -33.0,
+}
+//键：float64，值；[]float64
+groups := make(map[float64][]float64)
+
+for _, t := range temperatures {
+    g := math.Trunc(t/10) * 10 //将温度按10度的跨度进行分组
+    groups[g] = append(groups[g], t)
+}
+
+for g, temperatures := range groups {
+    fmt.Printf("%v : %v\n", g, temperatures)
+}
+
+/*
+上例输出结果：
+-20 : [-28 -29 -23 -28]
+30 : [32]
+-30 : [-31 -33]
+*/
+```
+
+## 最后注意一点
+在Go中map中的数据是无序的，如果要排序map中的值，一般会把map转成切片，在调用内置方法对切片进行排序来完成。
