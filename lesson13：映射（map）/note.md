@@ -94,3 +94,24 @@ for g, temperatures := range groups {
 
 ## 最后注意一点
 在Go中map中的数据是无序的，如果要排序map中的值，一般会把map转成切片，在调用内置方法对切片进行排序来完成。
+【示例：将切片去重并排序，在Go中没有set，但是可以使用map来实现set的功能】
+```
+numbers := []float64{
+    51.02, 10.2, -5.2, -10.4, 14.2, 10.2, 5.12, 51.02, -30.0, 4.3,
+}
+
+set := make(map[float64]bool)
+
+for _, t := range numbers {
+    set[t] = true
+}
+
+unique := make([]float64, 0, len(set))
+
+for t := range set {
+    unique = append(unique, t)
+}
+//排序
+sort.Float64s(unique)
+fmt.Println(unique) //[-30 -10.4 -5.2 4.3 5.12 10.2 14.2 51.02]
+```

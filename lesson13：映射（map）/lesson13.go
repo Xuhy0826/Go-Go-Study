@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math"
+	"sort"
 )
 
 func main() {
@@ -71,4 +72,24 @@ func main() {
 		30 : [32]
 		-30 : [-31 -33]
 	*/
+
+	//示例：将切片去重并排序，在Go中没有set，但是可以使用map来实现set的功能
+	numbers := []float64{
+		51.02, 10.2, -5.2, -10.4, 14.2, 10.2, 5.12, 51.02, -30.0, 4.3,
+	}
+
+	set := make(map[float64]bool)
+
+	for _, t := range numbers {
+		set[t] = true
+	}
+
+	unique := make([]float64, 0, len(set))
+
+	for t := range set {
+		unique = append(unique, t)
+	}
+	//排序
+	sort.Float64s(unique)
+	fmt.Println(unique) //[-30 -10.4 -5.2 4.3 5.12 10.2 14.2 51.02]
 }
