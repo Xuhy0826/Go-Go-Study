@@ -1,10 +1,24 @@
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+)
 
 type location struct {
 	lat  float64
 	long float64
+}
+
+type locationV2 struct {
+	Lat  float64
+	Long float64
+}
+
+type locationV3 struct {
+	Lat  float64 `json:"latitude"`
+	Long float64 `json:"longitude"`
 }
 
 func main() {
@@ -62,4 +76,27 @@ func main() {
 	*	{lat:-2.5152 long:23.145}
 	*	{lat:4.215 long:135.512}
 	 */
+
+	//struct转json
+	bytesV1, errV1 := json.Marshal(spirit)
+	exitOnError(errV1)
+	fmt.Println(string(bytesV1)) //{}
+
+	spiritV2 := locationV2{Lat: 12.433, Long: 144.843}
+	bytesV2, errV2 := json.Marshal(spiritV2)
+	exitOnError(errV2)
+	fmt.Println(string(bytesV2)) //{"Lat":12.433,"Long":144.843}
+
+	spiritV3 := locationV3{Lat: 12.433, Long: 144.843}
+	bytesV3, errV3 := json.Marshal(spiritV3)
+	exitOnError(errV3)
+	fmt.Println(string(bytesV3)) //{"latitude":12.433,"longitude":144.843}
+}
+
+//exitOnError prints any errors and exits.
+func exitOnError(err error) {
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }

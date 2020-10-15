@@ -57,3 +57,55 @@ fmt.Printf("%+v\n", curiosity) //{lat:0 long:137.4283}
 
 ## Json序列化
 在Go语言中，通过json包中的Marshal()方法将数据编码成json格式。注意方法返回的是bytes类型Json数据，我们可以将其转为string类型再使用。
+```
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+)
+
+type location struct {
+	lat  float64
+	long float64
+}
+
+func main(){
+	spirit := location{lat : -14.5637, long : 175.3774}
+	bytes, err := json.Marshal(spirit)	//转json
+	exitOnError(err)
+	fmt.Println(string(bytes))	//转string后输出
+}
+
+//exitOnError prints any errors and exits.
+func exitOnError(err error) {
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+```
+上面的示例代码很明了，就是声明struct后转json打印出来。但是运行后发现，输出的仅仅是一个“{}”,也就是说输出了一个没有任何字段的结构体数据。这是因为struct内以大写字母开头的字段才会被json化，而示例代码中的字段都是小写字母。在Go中，大写字母开头的字段就相当于C#中的public属性，这就好理解了。
+```
+type locationV2 struct {
+	Lat  float64
+	Long float64
+}
+
+spiritV2 := locationV2{Lat: 12.433, Long: 144.843}
+bytes, err := json.Marshal(spiritV2)
+exitOnError(err)
+fmt.Println(string(bytes)) //{"Lat":12.433,"Long":144.843}
+```
+其他部分不变，将字段名称的手写字母变成大写后，转json格式后可以看到结果了。   
+另外我们那也可以自定义字段转成Json后的字段名，在C#中可以通过在属性上加attribute的方式，在Go中的语法如下
+```
+type locationV3 struct {
+	Lat  float64 `json:"latitude"`
+	Long float64 `json:"longitude"`
+}
+
+spiritV3 := locationV3{Lat: 12.433, Long: 144.843}
+bytesV3, errV3 := json.Marshal(spiritV3)
+exitOnError(errV3)
+fmt.Println(string(bytesV3)) //{"latitude":12.433,"longitude":144.843}
+```
