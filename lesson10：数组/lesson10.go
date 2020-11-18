@@ -21,6 +21,9 @@ func main() {
 
 	//复合字面值 初始化数组
 	dwarfs := [5]string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris"}
+	//试试其他奇怪的写法
+	dwarfs2 := [4]string{"a", "b", "c"} //正常初始化
+	fmt.Println(dwarfs2[3])             //输出空
 	//或者
 	planetCollection := [...]string{
 		"Mercury",

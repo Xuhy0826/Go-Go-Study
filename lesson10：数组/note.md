@@ -56,6 +56,7 @@ for i := 0; i < len(dwarfs); i++ {
 ```
 dwarfs := [5]string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris"}
 
+//返回的两个参数，一个为索引一个为对应的值
 for i, dwarf := range dwarfs {
     fmt.Println(i, dwarf)
 }
@@ -106,6 +107,8 @@ func main(){
 ```
 
 ## 数组的数组（二维数组）
+这个没啥好说的，看个例子结束
+
 【示例】
 ```
 //二维数组
