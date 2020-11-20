@@ -43,7 +43,7 @@ fmt.Println(len(planetCollection)) //8
 
 ## 遍历数组
 ### for循环遍历
-* 使用for循环遍历数组
+* 使用 **for** 循环遍历数组
 ```
 dwarfs := [5]string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris"}
 
@@ -52,11 +52,11 @@ for i := 0; i < len(dwarfs); i++ {
     fmt.Println(i, dwarf)
 }
 ```
-* 使用range关键字来遍历数组，与python很类似
+* 使用 **range** 关键字来遍历数组，与python很类似
 ```
 dwarfs := [5]string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris"}
 
-//返回的两个参数，一个为索引一个为对应的值
+//返回的两个参数，一个为索引 一个为对应的值
 for i, dwarf := range dwarfs {
     fmt.Println(i, dwarf)
 }

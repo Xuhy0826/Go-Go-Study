@@ -1,7 +1,7 @@
 # 切片：指向数组的窗口
 
 ## 切分数组
-Go语言中对数组的切片写法类似python，比如上节中的数组planets，planets[0:4]即可获取索引0到索引4的元素 **（不包括索引4的元素）**。
+Go语言中对数组的切片写法类似python，比如上节中的数组planets，planets[0:4]即可获取索引0到索引4的4个元素 **（不包括索引4的元素）**。
 ```
 planets := [...]string{
     "Mercury",
@@ -50,6 +50,11 @@ planets := [...]string{
     "Uranus",
     "Neptune",
 }
+//切片可以简写，利用默认值
+var slice1 = planets[:3]
+var slice2 = planets[4:]
+var slice3 = planets[:]
+
 fmt.Println(slice1) //[Mercury Venus Earth]
 fmt.Println(slice2) //[Jupiter Saturn Uranus Poseidon]
 fmt.Println(slice3) //[Mercury Venus Earth Mars Jupiter Saturn Uranus Poseidon]
@@ -65,8 +70,9 @@ fmt.Println(tune) //tune
 question := "你在学习Go吗？"
 fmt.Println(question[:6]) //你在
 ```
-Go语言中，函数更加倾向于使用切片作为输入。除了切分数组，另外一个创建切片的简便方法是使用 **切片的复合字面量**
+Go语言中，函数更加倾向于使用切片作为输入。除了切分数组，另外一个创建切片的简便方法是使用 **切片的复合字面量** 。声明方法看下面的例子，区分一下，使用字面量声明数组的写法是[...]string，声明切片是[]string。
 ```
+//使用“切片复合”
 dwarfs := []string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris"}
 fmt.Printf("%T", dwarfs) //[]string
 ```
@@ -108,11 +114,14 @@ import (
 )
 
 func main() {
-    //使用sort方法
+    dwarfs := []string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris"}
+
+    //使用sort方法对切片进行排序：
+    //sort包中含有的StringSlice类型，先将dwarfs转换成StringSlice类型，之后再调用StringSlice类型的Sort方法
 	sort.StringSlice(dwarfs).Sort()
 	fmt.Println(dwarfs) //[Ceres Eris Haumea Makemake Pluto]
 
-	//简化上面的操作，自动执行类型转换和排序
+	//简化上面的操作，类型转换和排序一次执行
 	sort.Strings(dwarfs)
 }
 ```
