@@ -35,11 +35,11 @@ if moon, ok := temperature["Moon"]; ok {
     fmt.Println("Where is the moon?")
 }
 ```
-应该很容易理解，ok（可以使用其他参数名）在这里是个bool类型，若map中存在此键，则ok为true，反之为false。这种语法简化了我们在其他语言中还要去手动调用ContainKey()方法的语法。
+应该很容易理解，ok（可以使用其他参数名）在这里是个bool类型，若map中存在此键，则ok为true，反之为false。这种语法省去了我们在其他语言中还要去手动调用ContainKey()方法来判断字典中是否包含此元素的动作。
 
 ## map是不会被复制的
 
-之前的基本类型与数组不同，在被赋值给新的变量或者传递给函数或方法时都会创建新的副本。而map则不同，不管是赋值还是当做函数的参数，都是会共享底层数据的。看例子
+之前的基本类型与数组不同，在被赋值给新的变量或者传递给函数或方法时都会创建新的副本。而map则不同，不管是赋值还是当做函数的参数，都是会共享底层数据的（简单理解成都是传引用）。看例子
 ```
 planets := map[string]string{
     "Earth": "Sector ZZ9",
@@ -58,13 +58,14 @@ delete(planets, "Moon")    //移除不存在的元素，不会引发panic
 fmt.Println(planets)       //map[Mars:Sector ZZ9]
 fmt.Println(planetsMarkII) //map[Mars:Sector ZZ9]
 ```
+但是在Go中没有提供清空map的方法，因为你花时间清空还不如重新创建一个新的map，Go的GC效率很高。
 
 ## 使用make函数对map进行预分配
 声明map有两种方法，一种是之前用过的复合字面量，另一种就是使用make函数。make函数可以接收一个或两个参数，第二个参数用于指定键的数量来预分配空间。看实例。
 ```
 temperature := make(map[float64]int, 8)
 ```
-为map指定出事大小能够在map变大时减少一些后续操作。
+为map指定初始大小能够在map变大时减少一些后续操作。
 
 ## 使用映射和切片实现数据分组
 看实例吧，就是map和切片的一个综合应用。
