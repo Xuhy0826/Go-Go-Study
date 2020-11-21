@@ -16,16 +16,16 @@ curiosity.long = 137.4283
 fmt.Println(curiosity.lat, curiosity.long) //-4.9773 137.4283
 fmt.Println(curiosity)                     //{-4.9773 137.4283}
 ```
-将struct类型的变量赋值给新的变量也是会复制一份完全相同的值传递过去。
+将struct类型的变量赋值给新的变量也是会**复制一份完全相同的值**传递过去。
 ```
-curiosityMarkII := curiosity
+curiosityMarkII := curiosity //传递副本
 curiosity.lat = 0
 fmt.Println(curiosity)       //{0 137.4283}
-fmt.Println(curiosityMarkII) //{-4.9773 137.4283}
+fmt.Println(curiosityMarkII) //{-4.9773 137.4283}	//原值不改变
 ```
 
 ## 使用type声明可复用的结构
-上一节使用struct的方式有点类似C#中的匿名类，更常用的使用方法应该还是声明好一个struct后可以到处复用。看实例
+上一节使用struct的方式有点类似C#中的 $\color{#00CED1}{**匿名类**}$ ，更常用的使用方法应该还是声明好一个struct后可以到处复用。看实例
 ```
 type location struct {
 	lat  float64
@@ -33,7 +33,7 @@ type location struct {
 }
 
 func main() {
-    var spirit location
+    var spirit location		//声明一个location类型
 	spirit.lat = -14.5637
 	spirit.long = 175.3774
 
@@ -49,7 +49,7 @@ func main() {
 ```
 spirit := location{lat : -14.5637, long : 175.3774}
 ```
-使用fmt.Printf()格式化输出结构体数据时，可以使用 **%+v** 来显示结构中的字段名
+使用fmt.Printf()格式化输出结构体数据时，可以使用 **%+v** 来显示结构中的字段名。
 ```
 fmt.Printf("%v\n", curiosity)  //{0 137.4283}
 fmt.Printf("%+v\n", curiosity) //{lat:0 long:137.4283}
