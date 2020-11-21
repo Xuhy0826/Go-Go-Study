@@ -25,7 +25,7 @@ fmt.Println(curiosityMarkII) //{-4.9773 137.4283}	//原值不改变
 ```
 
 ## 使用type声明可复用的结构
-上一节使用struct的方式有点类似C#中的 $\color{#00CED1}{**匿名类**}$ ，更常用的使用方法应该还是声明好一个struct后可以到处复用。看实例
+上一节使用struct的方式有点类似C#中的<font color=#0000FF size=72>**匿名类**</font>，更常用的使用方法应该还是声明好一个struct后可以到处复用。看实例
 ```
 type location struct {
 	lat  float64
