@@ -9,6 +9,14 @@ dwarfs := []string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris"}
 dwarfs = append(dwarfs, "Orcus")
 fmt.Println(dwarfs) //	[Ceres Pluto Haumea Makemake Eris Orcus]
 ```
+* 如果切片是从数组的中间切了一部分出来（没切到最后），这时调用append函数，会替换切片之后的原数组元素。看例子比较清楚
+```
+dwarfs := []string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris", "Orcus"}
+dwarfsSlice := dwarfs[2:4]
+dwarfsSlice = append(dwarfsSlice1, "EEEE")
+fmt.Println(dwarfsSlice)  //[Haumea Makemake EEEE]
+fmt.Println(dwarfs)       //[Ceres Pluto Haumea Makemake EEEE Orcus]
+```
 * append函数是一个可变参数的函数
 ```
 dwarfs := []string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris"}
@@ -19,7 +27,7 @@ fmt.Println(dwarfs) //	[Ceres Pluto Haumea Makemake Eris Salacia Quaoar Sedna]
 ## 长度和容量
 * 切片的长度（length）：切片中元素的个数
 * 切片的容量（capacity）：不能简单的理解为“切片对应的底层数组的长度”，比如底层数组长度为10，如果切片从索引为4的地方开始切，那么这个切片的容量就是6。
-获取切片的长度或者容量，Go都已有内置的函数len()和cap()。
+获取切片的长度或者容量，Go都已有内置的函数**len()**和**cap()**。
 ```
 package main
 
@@ -59,7 +67,7 @@ fmt.Println(dwarfsRaw) //[Ceres Pluto Haumea Makemake Eris]
 ```
 可以看出，当为切片调用append函数追加元素时，若切片的容量够，则直接追加。若切片的容量不够，Go会将当前切片的底层数组复制到一个新的数组中，新数组的长度是原数组的两倍大。
 ![示意图](https://github.com/Xuhy0826/Golang-Study/blob/master/resource/AppendFunc.png)
-上面的例子中还有一个值得注意的地方，如果我们修改dwarfs3中的元素，dwarfs1不会受影响，而dwarfs2会相应的改变
+上面的例子中还有一个值得注意的地方，如果我们修改dwarfs3中的元素，dwarfs1不会受影响，而dwarfs2会相应的改变。
 ```
 dwarfs3[1] = "A"
 dump("dwarfs1", dwarfs1) //dwarfs1: length 5, capacity 5 [Ceres Pluto Haumea Makemake Eris]
@@ -67,10 +75,15 @@ dump("dwarfs2", dwarfs2) //dwarfs2: length 6, capacity 10 [Ceres A Haumea Makema
 ```
 
 ## 使用3个索引来切分数组
-* Go支持使用3个索引来切片，不一样的地方就是第三个索引用来“限制切片的容量”
+* Go支持使用3个索引来切片，第三个索引是用来“限制切片的容量”。
 ```
 planets := []string{"Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"}
 terrestrial := planets[0:4:4]
+terrestrial1 := planets[0:4]
+dump("terrestrial", terrestrial)   	//length 4, capacity 4 [Mercury Venus Earth Mars]
+dump("terrestrial1", terrestrial1) 	//length 4, capacity 8 [Mercury Venus Earth Mars]
+
+
 worlds := append(terrestrial, "Ceres")
 
 dump("planets", planets)         //planets: length 8, capacity 8 [Mercury Venus Earth Mars Jupiter Saturn Uranus Neptune]

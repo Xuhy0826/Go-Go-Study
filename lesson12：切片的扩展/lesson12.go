@@ -51,7 +51,12 @@ func main() {
 	fmt.Println(dwarfsRaw)   //[Ceres Pluto Haumea Makemake Eris]
 
 	//planets := []string{"Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"}
+	//使用三索引方式来声明切片
 	terrestrial := planets[0:4:4]
+	terrestrial1 := planets[0:4]
+	dump("terrestrial", terrestrial)   //length 4, capacity 4 [Mercury Venus Earth Mars]
+	dump("terrestrial1", terrestrial1) //length 4, capacity 8 [Mercury Venus Earth Mars]
+
 	worlds := append(terrestrial, "Ceres")
 
 	dump("planets", planets)         //planets: length 8, capacity 8 [Mercury Venus Earth Mars Jupiter Saturn Uranus Neptune]
