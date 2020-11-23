@@ -141,7 +141,7 @@ func main() {
 Go标准库导出了很多只有单个方法的接口，可以在自己的代码中实现它们。
 > Go通过简单的、通常只有单个方法的接口······来鼓励组合而不是继承，这些接口在各个组件之间形成了简明易懂的界限。 —— Rob Pike   
 
-*比如fmt包就声明了以下所示的Stringer接口:
+比如fmt包就声明了以下所示的Stringer接口:
 ```
 type Stringer interface{
 	String() string

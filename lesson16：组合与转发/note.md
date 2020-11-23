@@ -156,7 +156,7 @@ func main() {
 ```
 
 ## 使用组合还是继承
-引经据典：
+引经据典：   
 · 优先使用对象组合而不是类的继承
 > Favor object composition over class inheritance   ——Gang of Four
 
