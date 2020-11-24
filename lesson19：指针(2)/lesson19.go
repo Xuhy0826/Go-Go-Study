@@ -60,7 +60,7 @@ func (l *laser) talk() string {
 }
 
 func main() {
-	fmt.Println("lesson18 Pointer(2)")
+	fmt.Println("lesson19 Pointer(2)")
 
 	// jack := person{
 	// 	name: "Jack",
