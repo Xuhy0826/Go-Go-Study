@@ -149,6 +149,7 @@ var (
 )
 ```
 **【注意】** 按照惯例，Go的错误类型都用Err打头。   
+
 声明之后，我们就不用去临时声明`errors.New("out of bounds")`了，直接返回`ErrBound`就可以了。
 ```
 if !inBound(row, column) {
@@ -220,7 +221,8 @@ Go语言中没有提供异常机制，但是有名为panic的类似机制，前�
 ```
 panic("OMG, i'm sorry")
 ```
-**【注意】** panic在退出前会执行所有`defer`延迟的操作，而`os.Exit(1)`则不会这样，所以panic比`os.Exit(1)`还好点。当然，择情处理。   
+**【注意】** panic在退出前会执行所有`defer`延迟的操作，而`os.Exit(1)`则不会这样，所以panic比`os.Exit(1)`还好点。当然，择情处理。  
+
 当然Go也提供了“反悔”的办法，为了防止panic让程序崩溃，可以使用`recover`函数
 ```
 defer func() {
