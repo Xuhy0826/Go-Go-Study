@@ -82,7 +82,7 @@ func proverbsGracefully(name string) error {
 
 const rows, columns = 9, 9
 
-//模拟一个9*9的数独网格
+//Grid 模拟一个9*9的数独网格
 type Grid [rows][columns]int8
 
 func inBound(row, column int) bool {
@@ -99,6 +99,7 @@ func validDigit(digit int8) bool {
 	return digit >= 1 && digit < 9
 }
 
+//Set dede
 func (g *Grid) Set(row, column int, digit int8) error {
 	var errs SudokuError
 	if !inBound(row, column) {
@@ -116,11 +117,15 @@ func (g *Grid) Set(row, column int, digit int8) error {
 	return nil
 }
 
+//错误类型
 var (
+	//ErrBounds：“越界”错误
 	ErrBounds = errors.New("out of bounds")
-	ErrDigit  = errors.New("invalid digit")
+	//ErrDigit：非法数字
+	ErrDigit = errors.New("invalid digit")
 )
 
+//SudokuError ：自定义错误类型
 type SudokuError []error
 
 //Error返回一个或多个用逗号分隔的错误
