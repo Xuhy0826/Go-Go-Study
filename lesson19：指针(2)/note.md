@@ -128,8 +128,8 @@ func main(){
 切片在内部会被表示成包含三个元素的结构
 1. 指向数组的指针
 2. 切片的长度
-3. 切片的容量
-当切片被直接传递至函数或者方法的时候，切片的内部指针就可以对底层数组数据进行修改。  
+3. 切片的容量   
+当切片被直接传递至函数或者方法的时候，切片的内部指针就可以对底层数组数据进行修改。   
 **【注】**：指向切片本身的指针唯一的用处就是修改切片本身，包括长度、容量及起始位置。
 
 ## 指针和接口
@@ -152,8 +152,8 @@ func (m martain) talk() string {
 }
 
 func main(){
-    //无论是传递martian变量还是传递指向martian变量的指针，都可以满足talker接口
-    shout(martain{})  //NECK NECK
+	//无论是传递martian变量还是传递指向martian变量的指针，都可以满足talker接口
+	shout(martain{})  //NECK NECK
 	shout(&martain{}) //NECK NECK
 }
 ```
