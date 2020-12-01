@@ -24,7 +24,7 @@ func main() {
 	time.Sleep(time.Second * 4)
 }
 ```
-执行结果是，控制台会输出`.this is main func`，接着3秒之后，控制台会输出`...snore...`。但是注意，因为在main函数返回时，该程序运行的所有goroutine都会被回收，这就是为什么例子中的main函数需要一个比`sleepyGopher`函数长的等待时间。
+执行结果是，控制台会输出`.this is main func`，接着3秒之后，控制台会输出`...snore...`。但是注意，因为在main函数返回时，该程序运行的所有goroutine都会被回收，这就是为什么例子中的main函数需要一个比`sleepyGopher`函数长的等待时间。当然处理这个问题有很多方法，比如使用sync包中的`sync.WaitGroup`。
 
 ## 启动多个goroutine
 每次使用`go`关键字都会创建一个新的`goroutine`。
