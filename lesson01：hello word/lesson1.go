@@ -1,18 +1,19 @@
-//lesson1 不系统的学习什么特定的概念，随手尝试一下Go中的一些简单命令，对Go的风格有个第一映像
-
-//声明本代码所属的包
 package main
 
 //导入fmt包，使其可用
-import "fmt"
+import (
+	"fmt"
+)
 
 //声明main函数，注意Go中的大括号方式只支持这一种形式
 func main() {
 
-	//Println功能有点类似js中console.log方法
+	//几种控制台的打印方法
+	//打印后不换行
+	fmt.Print("Hello world \n") //Hello world
+	//打印后换行
 	fmt.Println("123456")              //123456
 	fmt.Println("hello", "world", "!") //hello world !
-
 	//使用Printf函数输出格式化的输出
 	//如何调整输出的对齐格式
 	//使用%后跟数字和v的方式，中间的数字就表示这个占位符的长度，正数表示靠右对齐，负数表示靠左对齐
