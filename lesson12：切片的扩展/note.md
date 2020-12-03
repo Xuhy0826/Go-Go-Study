@@ -13,7 +13,7 @@ fmt.Println(dwarfs) //	[Ceres Pluto Haumea Makemake Eris Orcus]
 ```
 dwarfs := []string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris", "Orcus"}
 dwarfsSlice := dwarfs[2:4]
-dwarfsSlice = append(dwarfsSlice1, "EEEE")	//这时使用append会将原数组的元素“Eris”替换掉
+dwarfsSlice = append(dwarfsSlice, "EEEE")	//这时使用append会将原数组的元素“Eris”替换掉
 fmt.Println(dwarfsSlice)  //[Haumea Makemake EEEE]
 fmt.Println(dwarfs)       //[Ceres Pluto Haumea Makemake EEEE Orcus]
 ```
