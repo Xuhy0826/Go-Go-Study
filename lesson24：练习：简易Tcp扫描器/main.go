@@ -13,6 +13,7 @@ import (
 要求开启一定数量的工作进程并行执行检测，获取所有打开的端口号并按序打印出来。
 如开启100个工作进程并发执行检测，检测IP为129.204.242.187的1~1024端口哪些是打开的，并按从小到大输出这些打开的端口。
 */
+
 //工作进程：检测tcp端口是否打开
 func checkPortWork(host string, tasks chan int, resultReceiver chan int, timeout time.Duration /*, wg *sync.WaitGroup*/) {
 	for {
@@ -43,7 +44,9 @@ func main() {
 	//wg := &sync.WaitGroup{}
 	tasks := make(chan int, *workerNum) //容量100的通道
 	resultReceiver := make(chan int)    //接收测试结果
+
 	fmt.Printf("scanning the %s\n", *hostname)
+
 	if *portBegin > *portEnd || *portEnd <= 0 || *portEnd >= 63528 {
 		fmt.Println("args is invalid")
 	}
@@ -68,10 +71,12 @@ func main() {
 			results = append(results, port)
 		}
 	}
+
 	//排序并输出结果
 	sort.Ints(results)
 	for _, port := range results {
 		fmt.Printf("\n port %d is open \n", port)
 	}
+
 	fmt.Println("scanning taks finished")
 }
