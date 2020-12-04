@@ -16,8 +16,7 @@ import (
 
 //工作进程：检测tcp端口是否打开
 func checkPortWork(host string, tasks chan int, resultReceiver chan int, timeout time.Duration /*, wg *sync.WaitGroup*/) {
-	for {
-		port := <-tasks
+	for port := range tasks {
 		url := fmt.Sprintf("%s:%d", host, port)
 		//fmt.Println("try to dial port ", port)
 		fmt.Print(". ")
@@ -77,6 +76,9 @@ func main() {
 	for _, port := range results {
 		fmt.Printf("\n port %d is open \n", port)
 	}
+
+	close(tasks)
+	close(resultReceiver)
 
 	fmt.Println("scanning taks finished")
 }
