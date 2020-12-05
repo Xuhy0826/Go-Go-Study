@@ -32,7 +32,7 @@ fmt.Println(186, "seconds")
 2. 参数a的类型为interface{}，是一个空接口。空接口可以接收所有类型
 > 所以，...和interface{}结合到一起，就可以接收任意数量任意类型的参数
 
-* 最后写个例子
+* 最后写两个例子
 ```
 package main
 
@@ -45,10 +45,23 @@ func kelvinToCelsius(k float64) float64 {
 	return k
 }
 
+//addAll 多数相加
+func addAll(a int, numbers ...int) int {
+	sum := a
+	for _, v := range numbers {
+		sum += v
+	}
+	return sum
+}
+
 func main() {
 	fmt.Println("lesson7 函数")
 	kelvin := 294.0
+	
 	celsius := kelvinToCelsius(kelvin)
 	fmt.Println(kelvin, "°K is", celsius, "°C") //294 °K is 20.850000000000023 °C
+
+	sum := addAll(3, 4, 5, 6, 7)
+	fmt.Println(sum)  //25
 }
 ```
