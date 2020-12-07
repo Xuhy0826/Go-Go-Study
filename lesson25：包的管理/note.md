@@ -59,6 +59,7 @@ func MultiplyAll(a int, numbers ...int) int {
 	return sum
 }
 ```
+（2）引用定义好的包
 定义好自己的包之后，main函数就可以进行引用了。注意import的路径规则是`import %模块名%/[路径名]/包名`。如下所示：
 ```
 package main
@@ -76,12 +77,11 @@ func main() {
 	fmt.Println(res)    //120
 }
 ```
-了解这些基本规则，可以试试稍微复杂点的引用关系。
+了解这些基本规则，可以试试稍微复杂点的引用关系。可以看看本节的示例。
 * 本例中的文件路径结构与其包的引用关系图：
 ![文件与package](https://github.com/Xuhy0826/Golang-Study/blob/master/resource/packageAtch.jpg)
 * 本例中的代码引用关系：
-![import package](https://github.com/Xuhy0826/Golang-Study/blob/master/resource/importMyPackage.jpg)
-之间的关系可以说是很简单直接的。
+![import package](https://github.com/Xuhy0826/Golang-Study/blob/master/resource/importMyPackage.jpg)   
 
 ## 支持远程包导入
 很常见的情况是包在GitHub上，如果现在要导入一个远程的包，比如要引用postgres的驱动`import "github.com/bmizerany/pq"`, 编译在导入它时，会先在`GOPATH`下搜索这个包，如果没有，会在使用`go get`命令来获取远程的包，并且会把获取到的源代码存储在GOPATH目录下对应URL的目录里。
