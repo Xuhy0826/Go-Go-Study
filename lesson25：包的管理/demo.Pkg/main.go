@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 
-	c "demo.Pkg/calc"
 	"demo.Pkg/myutils"
 	_ "github.com/bmizerany/pq"
 )
@@ -21,6 +20,4 @@ func main() {
 
 	fmt.Println("myutils's name is", myutils.Name)
 	//myutils's name is xuhyUtil
-
-	fmt.Println(c.Add(1, 4)) //5
 }
