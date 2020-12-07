@@ -3,8 +3,14 @@ package main
 import (
 	"fmt"
 
+	c "demo.Pkg/calc"
 	"demo.Pkg/myutils"
+	_ "github.com/bmizerany/pq"
 )
+
+func init() {
+	fmt.Println("main : initial...")
+}
 
 func main() {
 	sum := myutils.UtilAdd(1, 3)
@@ -15,4 +21,6 @@ func main() {
 
 	fmt.Println("myutils's name is", myutils.Name)
 	//myutils's name is xuhyUtil
+
+	fmt.Println(c.Add(1, 4)) //5
 }

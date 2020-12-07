@@ -86,3 +86,37 @@ func main() {
 
 ## 支持远程包导入
 很常见的情况是包在GitHub上，如果现在要导入一个远程的包，比如要引用postgres的驱动`import "github.com/bmizerany/pq"`, 编译在导入它时，会先在`GOPATH`下搜索这个包，如果没有，会在使用`go get`命令来获取远程的包，并且会把获取到的源代码存储在GOPATH目录下对应URL的目录里。
+
+#### 重命名包
+我们可以对引入的包进行命名，比如
+```
+import(
+	c "demo.Pkg/calc"
+)
+
+func main() {
+	c.Add(1, 4)
+}
+```
+Go语言中有一个挺不错的规则，如果你使用import引入的包没有使用的话，编译器会报错。这就让我们不会引入多余的包。
+
+#### init函数
+`init`函数会在每个包完成初始化后自动执行，并且会在`main`函数之前执行。`init`函数没有入参也没有返回值。`init`函数一般用来初始化一些变量或运行某些特殊的初始化动作。
+```
+func init() {
+	fmt.Println("main : initial...")
+}
+
+func main() {
+	fmt.Println("main: main func") 
+}
+```
+执行的输出：
+```
+> main : initial...
+> main: main func
+```
+Go编译器不允许声明导入某个包却不使用，但是如果需要某些包来执行其`init`函数的话，可以使用下划线来让Go编译器支持这样的导入并执行其`init`函数。
+```
+_ "github.com/goinaction/code/chapter2/sample/matchers"
+```
