@@ -85,7 +85,7 @@ func main() {
 ![import package](https://github.com/Xuhy0826/Golang-Study/blob/master/resource/importMyPackage.jpg)   
 
 ## 支持远程包导入
-很常见的情况是包在GitHub上，如果现在要导入一个远程的包，比如要引用postgres的驱动`import "github.com/bmizerany/pq"`, 编译在导入它时，会先在`GOPATH`下搜索这个包，如果没有，会在使用`go get`命令来获取远程的包，并且会把获取到的源代码存储在GOPATH目录下对应URL的目录里。
+很常见的情况是包在GitHub上，如果现在要导入一个远程的包，比如要引用postgres的驱动`import "github.com/lib/pq"`, 编译在导入它时，会先在`GOPATH`下搜索这个包，如果没有，会在使用`go get`命令来获取远程的包，并且会把获取到的源代码存储在GOPATH目录下对应URL的目录里。
 
 #### 重命名包
 我们可以对引入的包进行命名，比如
