@@ -7,6 +7,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
+//定义全局变量
 var db *sql.DB
 
 const (
@@ -18,25 +19,36 @@ const (
 )
 
 func main() {
+	//（1）连接数据库
 	err := initDb()
 	if err == nil {
 		fmt.Println("connect successfully")
+
+		//（2）查询数据
+		entity, err := queryByID(3)
+		if err != nil {
+			fmt.Println("query failer,", err.Error())
+		} else {
+			fmt.Printf("%+v", entity)
+		}
 	}
+
 }
 
+//initDb 初始化与连接
 func initDb() error {
 	connStr :=
 		fmt.Sprintf("host=%s port=%d user=%s "+"password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
 	fmt.Println(connStr)
 
-	db, err := sql.Open("postgres", connStr) //驱动名称为：postgres
+	var err error
+	db, err = sql.Open("postgres", connStr) //驱动名称为：postgres
 
 	if err != nil {
 		fmt.Println("Connected failed.", err.Error())
 		return err
 	}
-
 	//ctx := context.Background()
 	//err = db.PingContext(ctx)
 
@@ -44,14 +56,12 @@ func initDb() error {
 	if err != nil {
 		fmt.Println("ping failed.", err.Error())
 	}
-
-	// rows, err := db.Query("select * from public.test")
-
-	// if err == nil {
-	// 	rows.Close()
-	// } else {
-	// 	fmt.Println("query failed.", err.Error())
-	// }
-
 	return nil
+}
+
+//queryById 通过Id查询单笔数据
+func queryByID(id int) (entity testEntity, err error) {
+	entity = testEntity{}
+	err = db.QueryRow("select t.id, t.msg, t.create_time from public.test t where t.id = @Id", sql.Named("Id", id)).Scan(&entity.id, &entity.msg, &entity.createTime)
+	return
 }
