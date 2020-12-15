@@ -62,6 +62,6 @@ func initDb() error {
 //queryById 通过Id查询单笔数据
 func queryByID(id int) (entity testEntity, err error) {
 	entity = testEntity{}
-	err = db.QueryRow("select t.id, t.msg, t.create_time from public.test t where t.id = @Id", sql.Named("Id", id)).Scan(&entity.id, &entity.msg, &entity.createTime)
+	err = db.QueryRow(fmt.Sprintf("select t.id, t.msg, t.create_time from public.test t where t.id = %v", id)).Scan(&entity.id, &entity.msg, &entity.createTime)
 	return
 }
