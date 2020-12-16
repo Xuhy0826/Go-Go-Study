@@ -37,6 +37,7 @@ Go连接数据要用到的包
 * QueryRowContext ：QueryRow的上下文版本
 
 #### Query
+查询，返回多笔数据。直接看例子简单明了
 * 返回类型：`type Rows struct{}`
 * `Rows`的方法
 * * func(re *Rows) Close() error
@@ -47,9 +48,98 @@ Go连接数据要用到的包
 * * func(re *Rows) Next() bool
 * * func(re *Rows) NextResultSet() bool
 * * func(re *Rows) Scan(dest ...interface{}) error  //将查到的数据一一赋值到Scan的入参中，有点类似RowMapper功能
+```
+func queryByDate(minDate time.Time) (entityCollection []testEntity, err error) {
+	sqlStr := "SELECT id, msg, create_time FROM public.test where create_time > $1"
+	rows, err := db.Query(sqlStr, minDate)
+	//使用Next方法读数据，类似ADO.NET的Read()方法
+	for rows.Next() {
+		entity := testEntity{}
+		err = rows.Scan(&entity.id, &entity.msg, &entity.createTime)
+		if err != nil {
+			return
+		}
+		entityCollection = append(entityCollection, entity)
+	}
+	return
+}
+```
 
 #### QueryRow
+查询，返回单笔数据。直接看例子简单明了
 * 返回类型：`type Row struct{}`
 * `Row`的方法
 * * func(re *Row) Err() error
 * * func(re *Row) Scan(dest ...interface{}) error
+```
+func queryByID(id int) (entity testEntity, err error) {
+	entity = testEntity{}
+	sqlStr := "select t.id, t.msg, t.create_time from public.test t where t.id = $1"
+	err = db.QueryRow(sqlStr, id).Scan(&entity.id, &entity.msg, &entity.createTime)
+	return
+}
+```
+
+#### Exec
+执行命令，直接看例子简单明了
+* 返回类型：`type Result struct{}`
+```
+func updateEntity(entity testEntity) (newEntity testEntity, err error) {
+	sqlStr := "UPDATE public.test SET msg=$1, create_time=$2 WHERE id=$3"
+	_, err = db.Exec(sqlStr, entity.msg, time.Now(), entity.id)
+	if err != nil {
+		return
+	}
+	newEntity, err = queryByID(entity.id)
+	return
+}
+```
+
+#### Prepare
+这个比较特殊，可以成为预处理，下面[摘抄来自](https://blog.csdn.net/qq_34857250/article/details/100569676)
+> * 什么是预处理
+> 普通SQL语句执行过程：
+> 1. 客户端对SQL语句进行占位符替换得到完整的SQL语句。
+> 2. 客户端发送完整SQL语句到数据库服务端
+> 3. 数据库服务端执行完整的SQL语句并将结果返回给客户端。
+> 
+> * 预处理执行过程：
+> 1. 把SQL语句分成两部分，命令部分与数据部分。
+> 2. 先把命令部分发送给数据库服务端，数据库服务端进行SQL预处理。
+> 3. 然后把数据部分发送给MySQL服务端，数据库服务端对SQL语句进行占位符替换。
+> 4. 数据库服务端执行完整的SQL语句并将结果返回给客户端。
+> 
+> * 为什么需要 Prepare
+> 1. 优化MySQL服务器重复执行SQL的方法，可以提升服务器性能，提前让服务器编译，一次编译多次执行，节省后续编译的成本。
+> 2. 避免SQL注入问题
+
+```
+func insertEntities(entityCollection []testEntity) (err error) {
+	sqlStr :=
+		`
+	INSERT INTO public.test(
+	id, msg, create_time
+	)
+	VALUES (
+	$1, $2, $3
+	)
+	`
+	stmt, err := db.Prepare(sqlStr) //进行预处理
+	defer stmt.Close()              //由于statement需要关闭
+	if err != nil {
+		fmt.Println("prepare failed ,", err.Error())
+		return
+	}
+
+	for _, e := range entityCollection {
+		_, err = stmt.Exec(e.id, e.msg, time.Now())
+		if err != nil {
+			fmt.Println("insert failed , id = ", e.id, err.Error())
+			return
+		}
+	}
+	return
+}
+```
+
+#### 事务
