@@ -1,9 +1,10 @@
 # Go操作PostgreSql：CURD
+Go如何与关系型数据库进行简单的交互操作。
 
 ## 连接到数据库
 Go连接数据要用到的包
-1. database/sql
-2. 相应的数据库的驱动（PostgreSql：github.com/lib/pq）
+1. 内置包：database/sql
+2. 相应的数据库的驱动，需要选择并下载（PostgreSql：github.com/lib/pq）
 
 #### 连接到数据库
 * 要连接到数据库，首先要加载数据库的驱动，驱动里包含与数据库交互的逻辑。
@@ -143,3 +144,38 @@ func insertEntities(entityCollection []testEntity) (err error) {
 ```
 
 #### 事务
+简单的几个要素：
+1. 开启事务：`db.Begin()`，返回`sql.Tx`，后续使用其进行sql操作
+2. 执行操作：`tx.Exec()` 或 `tx.Query()`等
+3. 提交事务：`tx.Commit()`
+4. 回滚：`tx.Rollback()`
+```
+func execByTransaction(entity testEntity) (err error) {
+	tx, err := db.Begin() //开启事务
+	if err != nil {
+		fmt.Println("open Transaction failed,", err.Error())
+	}
+	sqlStr1 := "INSERT INTO public.test(id, msg, create_time) VALUES ($1, $2, $3)"
+	sqlStr2 := "Update public.test SET msg=$1, create_time=$2 WHERE id=$3"
+
+	_, err = tx.Exec(sqlStr1)
+	if err != nil {
+		tx.Rollback() // 回滚
+		fmt.Println("exec sqlStr1 failed,", err.Error())
+		return
+	}
+	_, err = tx.Exec(sqlStr2)
+	if err != nil {
+		tx.Rollback() // 回滚
+		fmt.Println("exec sqlStr2 failed,", err.Error())
+		return
+	}
+	err = tx.Commit() //提交事务
+	if err != nil {
+		tx.Rollback() // 回滚
+		fmt.Println("commit failed", err.Error())
+		return
+	}
+	return
+}
+```

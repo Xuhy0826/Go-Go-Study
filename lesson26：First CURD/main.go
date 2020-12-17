@@ -169,3 +169,33 @@ func insertEntities(entityCollection []testEntity) (err error) {
 	}
 	return
 }
+
+//execByTransaction 执行事务
+func execByTransaction(entity testEntity) (err error) {
+	tx, err := db.Begin() //开启事务
+	if err != nil {
+		fmt.Println("open Transaction failed,", err.Error())
+	}
+	sqlStr1 := "INSERT INTO public.test(id, msg, create_time) VALUES ($1, $2, $3)"
+	sqlStr2 := "Update public.test SET msg=$1, create_time=$2 WHERE id=$3"
+
+	_, err = tx.Exec(sqlStr1)
+	if err != nil {
+		tx.Rollback() // 回滚
+		fmt.Println("exec sqlStr1 failed,", err.Error())
+		return
+	}
+	_, err = tx.Exec(sqlStr2)
+	if err != nil {
+		tx.Rollback() // 回滚
+		fmt.Println("exec sqlStr2 failed,", err.Error())
+		return
+	}
+	err = tx.Commit() //提交事务
+	if err != nil {
+		tx.Rollback() // 回滚
+		fmt.Println("commit failed", err.Error())
+		return
+	}
+	return
+}
