@@ -3,7 +3,7 @@
 ## 连接到数据库
 Go连接数据要用到的包
 1. database/sql
-2. 相应的数据库的驱动（PostgreSql：github.com/bmizerany/pq）
+2. 相应的数据库的驱动（PostgreSql：github.com/lib/pq）
 
 #### 连接到数据库
 * 要连接到数据库，首先要加载数据库的驱动，驱动里包含与数据库交互的逻辑。
@@ -19,7 +19,7 @@ Go连接数据要用到的包
 * 驱动一般是在包的Init函数中进行注册的，也就是包能够自我注册。
 
 #### 安装数据库驱动
-* `go get github.com/bmizerany/pq`
+* `go get github.com/lib/pq`
 
 #### Ping函数
 * 通过Ping函数来测试下连接是否有效
@@ -110,7 +110,7 @@ func updateEntity(entity testEntity) (newEntity testEntity, err error) {
 > 4. 数据库服务端执行完整的SQL语句并将结果返回给客户端。
 > 
 > * 为什么需要 Prepare
-> 1. 优化MySQL服务器重复执行SQL的方法，可以提升服务器性能，提前让服务器编译，一次编译多次执行，节省后续编译的成本。
+> 1. 优化数据库服务器重复执行SQL的方法，可以提升服务器性能，提前让服务器编译，一次编译多次执行，节省后续编译的成本。
 > 2. 避免SQL注入问题
 
 ```

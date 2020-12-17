@@ -19,6 +19,16 @@ const (
 	dbname   = "biz"
 )
 
+type testEntity struct {
+	id         int
+	msg        string
+	createTime time.Time
+}
+
+func (entity testEntity) String() string {
+	return fmt.Sprintf("entity : {id: %v, msg: %v, createTime: %v }", entity.id, entity.msg, entity.createTime.Format("2006-01-02 15:04:05"))
+}
+
 func main() {
 	//（1）连接数据库
 	err := initDb()
@@ -28,7 +38,7 @@ func main() {
 		//（2）查询数据一
 		entity, err := queryByID(3)
 		if err != nil {
-			fmt.Println("query failer,", err.Error())
+			fmt.Println("query failed,", err.Error())
 		} else {
 			fmt.Println(entity)
 		}
@@ -37,7 +47,7 @@ func main() {
 		date := time.Date(2020, 12, 16, 0, 0, 0, 0, time.Local)
 		entityCollection, err := queryByDate(date)
 		if err != nil {
-			fmt.Println("query failer,", err.Error())
+			fmt.Println("query failed,", err.Error())
 		} else {
 			for _, e := range entityCollection {
 				fmt.Println(e)
@@ -48,7 +58,7 @@ func main() {
 		entity.msg = entity.msg + " !!!"
 		newEntity, err := updateEntity(entity)
 		if err != nil {
-			fmt.Println("execute failer,", err.Error())
+			fmt.Println("execute failed,", err.Error())
 		} else {
 			fmt.Println(newEntity)
 		}
@@ -63,7 +73,7 @@ func main() {
 		}
 		err = insertEntities(entities)
 		if err != nil {
-			fmt.Println("insert failer,", err.Error())
+			fmt.Println("insert failed,", err.Error())
 		} else {
 			for _, e := range entities {
 				entity, _ := queryByID(e.id)
