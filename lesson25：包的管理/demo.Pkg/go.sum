@@ -1,2 +1,4 @@
 github.com/bmizerany/pq v0.0.0-20131128184720-da2b95e392c1 h1:1clOQIolnXGoH1SUo8ZPgdfOWFp/6i8NuRerrVL/TAc=
 github.com/bmizerany/pq v0.0.0-20131128184720-da2b95e392c1/go.mod h1:YR6v6TjYGQnPky7rSf5U+AiQ4+EHIVmFYbhHUPo5L2U=
+github.com/lib/pq v1.9.0 h1:L8nSXQQzAYByakOFMTwpjRoHsMJklur4Gi59b6VivR8=
+github.com/lib/pq v1.9.0/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=

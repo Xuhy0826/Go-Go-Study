@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"demo.Pkg/myutils"
-	_ "github.com/bmizerany/pq"
+	_ "github.com/lib/pq"
 )
 
 func init() {
