@@ -38,6 +38,10 @@ func main() {
 	fmt.Println(len(planetCollection)) //8
 	fmt.Println(planetCollection)      //[Mercury Venus Earth Mars Jupiter Saturn Uranus Neptune]
 
+	//使用索引来为数组赋值
+	array := [5]int{1: 10, 3: 30}
+	fmt.Printf("%+v\n", array) //[0 10 0 30 0]
+
 	//for循环遍历数组
 	for i := 0; i < len(dwarfs); i++ {
 		dwarf := dwarfs[i]
