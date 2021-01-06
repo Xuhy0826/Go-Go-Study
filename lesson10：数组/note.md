@@ -40,6 +40,11 @@ planetCollection := [...]string{
 }
 fmt.Println(len(planetCollection)) //8
 ```
+也可以使用索引来为数组赋初始值。
+```
+array := [5]int{1: 10, 3: 30}
+fmt.Printf("%+v\n", array) //[0 10 0 30 0]
+```
 
 ## 遍历数组
 ### for循环遍历
