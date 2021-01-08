@@ -24,9 +24,23 @@ dwarfs := []string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris"}
 dwarfs = append(dwarfs, "Salacia", "Quaoar", "Sedna")
 fmt.Println(dwarfs) //	[Ceres Pluto Haumea Makemake Eris Salacia Quaoar Sedna]
 ```
+* append函数可直接拼接切片
+```
+// 创建两个切片，并分别用两个整数进行初始化
+s1 := []int{1, 2}
+s2 := []int{3, 4}
+
+// 将两个切片追加在一起，并显示结果
+fmt.Printf("%v\n", append(s1, s2...))   //[1 2 3 4]
+```
+
 ## 长度和容量
 * 切片的长度（length）：切片中元素的个数
-* 切片的容量（capacity）：不能简单的理解为“切片对应的底层数组的长度”，比如底层数组长度为10，如果切片从索引为4的地方开始切，那么这个切片的容量就是6。
+* 切片的容量（capacity）：不能简单的理解为“切片对应的底层数组的长度”，比如底层数组长度为10，如果切片从索引为4的地方开始切，那么这个切片的容量就是6。因为无法访问到它所指向的底层数组的第一个元素之前的部分。   
+对底层数组容量是 k 的切片 slice[i:j]来说：
+1. 长度: j - i
+2. 容量: k - i   
+
 获取切片的长度或者容量，Go都已有内置的函数**len()**和**cap()**。
 ```
 package main
@@ -75,7 +89,18 @@ dump("dwarfs2", dwarfs2) //dwarfs2: length 6, capacity 10 [Ceres A Haumea Makema
 ```
 
 ## 使用3个索引来切分数组
-* Go支持使用3个索引来切片，第三个索引是用来“限制切片的容量”。
+* Go支持使用3个索引来切片，第三个索引是用来“限制切片的容量”。   
+比如
+```
+source := []string{"Apple", "Orange", "Plum", "Banana", "Grape"}
+slice := source[2:3:4]
+```
+这就表示切片“切取”了source数组索引2到索引3之间的元素，其实也就是索引为2的那个元素，这是切片的长度是1。如果没有第三个参数，这时切片slice的容量会是3。但是此时使用到了第三个参数，也是表示数组的索引值。这个索引值表示这个切片的容量最大到原数组的那个索引。这样一来，声明的slice切片容量为2。   
+* 对于 slice[i:j:k] 或 [2:3:4]
+1. 长度: j – i 或 3 - 2 = 1
+2. 容量: k – i 或 4 - 2 = 2   
+
+再看一个稍微复杂的例子体会一下。
 ```
 planets := []string{"Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"}
 terrestrial := planets[0:4:4]
@@ -83,13 +108,13 @@ terrestrial1 := planets[0:4]
 dump("terrestrial", terrestrial)   	//length 4, capacity 4 [Mercury Venus Earth Mars]
 dump("terrestrial1", terrestrial1) 	//length 4, capacity 8 [Mercury Venus Earth Mars]
 
-
 worlds := append(terrestrial, "Ceres")
 
 dump("planets", planets)         //planets: length 8, capacity 8 [Mercury Venus Earth Mars Jupiter Saturn Uranus Neptune]
 dump("terrestrial", terrestrial) //terrestrial: length 4, capacity 4 [Mercury Venus Earth Mars]
 dump("worlds", worlds)           //worlds: length 5, capacity 8 [Mercury Venus Earth Mars Ceres]
 ```
+上面的例子可以看出，在为指定了容量的切片执行`append`操作时，如果容量不够用了，`append`返回的新切片会指向重新创建的一个新的底层数组，与原有的底层数组分离。这样能够更加安全地进行后续修改。
 
 ## 使用make函数对切片进行预分配
 当切片的容量不足以执行append时，会创建一个新的数组并进行复制。但是如果使用make函数来声明切片则可以自定义切片的长度和容量。
