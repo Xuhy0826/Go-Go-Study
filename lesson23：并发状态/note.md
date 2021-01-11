@@ -1,6 +1,6 @@
 # 并发状态
 
-在使用goroutine后不得不面对一个问题，就是当多个goroutine同时去操作同一个共享值就会发生并发问题。在其他语言中我们往往会通过上锁来解决这类问题，那么在Golang中该如何解决。
+在使用goroutine后不得不面对一个问题，就是当多个goroutine同时去操作同一个共享值就会发生并发问题，这种情况被称作竞争状态（race candition）。在其他语言中我们往往会通过上锁来解决这类问题，那么在Golang中该如何解决。
 
 ## 互斥锁
 Go中提供了互斥锁`Mutex`(mutual exclusive)，存在于包sync中。从名字大概就可以理解其意思。   
@@ -37,6 +37,62 @@ func (v *Visited) VisitLink(url string) int {
 }
 ```
 * 使用互斥锁时要小心陷入**死锁**。
+
+## 原子函数
+原子函数能够以很底层的加锁机制来同步访问整型变量和指针。atmoic包中两个有用的原子函数是 LoadInt64 和 StoreInt64。这两个函数提供了一种安全地读
+和写一个整型值的方式。如下示例
+```
+package main
+
+import (
+	"fmt"
+	"runtime"
+	"sync"
+	"sync/atomic"
+	"time"
+)
+
+var (
+	// shutdown 是通知正在执行的 goroutine 停止工作的标志
+	shutdown int64
+	wg       sync.WaitGroup
+)
+
+func main() {
+	wg.Add(2)
+
+	fmt.Println("Start Goroutines")
+
+	// 创建两个 goroutine
+	go doWork("A")
+	go doWork("B")
+
+	// 给定 goroutine 执行的时间
+	time.Sleep(1 * time.Second)
+
+	// 该停止工作了，安全地设置 shutdown 标志
+	fmt.Println("Shutdown Now")
+	atomic.StoreInt64(&shutdown, 1)
+
+	wg.Wait()
+}
+
+// doWork 用来模拟执行工作的 goroutine，检测之前的 shutdown 标志来决定是否提前终止
+func doWork(name string) {
+	defer wg.Done()
+	for {
+		fmt.Printf("Doing %s Work\n", name)
+		time.Sleep(250 * time.Millisecond)
+
+		if atomic.LoadInt64(&shutdown) == 1 {
+			fmt.Printf("Shutting %s Down\n", name)
+			break
+		}
+	}
+}
+```
+atmoic包的`AddInt64`函数。这个函数会同步整型值的加法，方法是强制同一时刻只能有一个**goroutine**运行并完成这个加法操作，例`atomic.AddInt64(&counter, 1)`，类似于C#中的原子累加器`Interlocked.Increment(ref ActivityCount);`。
+
 
 ## 长时间运行的工作进程
 我们将一直存在并且独立运行的goroutine成为“工作进程”（worker）。比如一些定时执行某些功能的工作进程，如网站的轮询器等。在C#中我们可以使用一个定时器来完成这样的需求，那么在Golang中我们该如何搭建一个较为通用的工作进程。
