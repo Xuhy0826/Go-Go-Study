@@ -282,13 +282,11 @@ import (
 	"io"
 	"log"
 	"math/rand"
-	"os"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"demo24/pool"
-	"demo24/runner"
 )
 
 const (
@@ -412,7 +410,50 @@ func (p *Pool) Shutdown() {
 	p.wg.Wait()
 }
 ```
-接下来让看一下 main.go 如何使用。
+接下来让看一下 main.go 如何使用。示例的工作任务很简单，只是打印出name字段。
 ```
+// names 提供了一组用来显示的名字
+var names = []string{
+	"steve",
+	"bob",
+	"mary",
+	"jason",
+	"therese",
+}
 
+type namePrinter struct {
+	name string
+}
+
+// Task 实现 Worker 接口
+func (m *namePrinter) Task() {
+	log.Println(m.name)
+	time.Sleep(time.Second)
+}
+
+func testWork() {
+	// 创建有两个goroutine的工作池
+	p := work.New(2)
+
+	var wg sync.WaitGroup
+	wg.Add(100 * len(names))
+
+	for i := 0; i < 100; i++ {
+		for _, name := range names {
+			np := namePrinter{
+				name: name,
+			}
+
+			go func() {
+				//将任务提交
+				p.Run(&np)
+				wg.Done()
+			}()
+		}
+	}
+
+	wg.Wait()
+
+	p.Shutdown()
+}
 ```
