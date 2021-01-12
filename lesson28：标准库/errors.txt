@@ -1,0 +1,2 @@
+ERROR: 2021/01/01 22:19:43 main.go:51: Something has failed
+ERROR: 2021/01/12 23:02:20 logDemo.go:51: Something has failed
