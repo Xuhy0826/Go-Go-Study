@@ -118,6 +118,90 @@ func main() {
 
 ## json包
 json包是用来编解码json格式数据的。在前面的学习中也有过简单接触。
-使用http包获取Google搜索API返回的JSON。
+使用http包获取Google搜索API返回的JSON的示例如下。
+```
+
+```
+其中`NewDecoder`根据传入的`io.Reader`接口类型值返回一个指向`Decoder`类型的指针值。`Decode`方法接受`interface{}`类型的值为入参。使用反射，`Decode`方法会拿到传入值的类型信息。然后，在读取 JSON 响应的过程中，`Decode`方法会将对应的响应解码为这个类型的值。  
+如果JSON数据是字符串的形式存在，则需要用到json包中的`Unmarshal`函数进行反序列化。
+```
+type Contact struct {
+	Name    string `json:"name"`
+	Title   string `json:"title"`
+	Address struct {
+		Home string `json:"home"`
+		Cell string `json:"cell"`
+	} `json:"address"`
+}
+
+func jsonDeserilizeTest() Contact {
+	var JSON = `{
+		"name": "Gopher",
+		"title": "programmer",
+		"address": {
+			"home": "415.333.3333",
+			"cell": "415.555.5555"
+		}
+	}
+	`
+	var c Contact
+	//进行json反序列化
+	err := json.Unmarshal([]byte(JSON), &c)
+	if err != nil {
+		log.Println("Error", err)
+		return
+	}
+	fmt.Printf("%+v", c)
+}
+```
+> 输出：{Name:Gopher Title:programmer Contact:{Home:415.333.3333 Cell:415.555.5555}}  
+
+有时不方便为json数据声明一个固定的类型，可以将json文档解码到一个`map`变量中。那么把上一个示例中代码进行如下修改即可。
+```
+var c map[string]interface{}
+//进行json反序列化
+err := json.Unmarshal([]byte(JSON), &c)
+if err != nil {
+	log.Println("Error", err)
+	return
+}
+
+//访问
+fmt.Println("Name:", c["name"])
+fmt.Println("Title:", c["title"])
+fmt.Println("Address")
+fmt.Println("H:", c["address"].(map[string]interface{})["home"])
+fmt.Println("C:", c["address"].(map[string]interface{})["cell"])
+```
+之前介绍的是将json文档转成对象，即反序列化。那么再看下使用json包进行对象的序列化。在“lesson14：结构体”中也学习过json序列化功能，当时使用的是json包中的`Marshal`方法将数据编码成json格式，`bytes, err := json.Marshal(spirit)`，序列化后得到的是`bytes`类型。这里再看下另一个方法` MarshalIndent `。这个函数可以将 map 类型的值或者结构类型的值转换为易读格式的 JSON 文档，也就是说他和`Marshal`的区别就是为我们增加了换行和缩进，让json看起来更美观。 
+```
+contact := Contact{
+	Name:  "Gopher",
+	Title: "programmer",
+}
+contact.Address.Home = "415.333.3333"
+contact.Address.Cell = "415.555.5555"
+
+data, err := json.MarshalIndent(contact, "", " ")
+if err != nil {
+	log.Println("ERROR:", err)
+	return
+}
+
+fmt.Println(string(data))
+```
+输出如下，都已实现了换行和缩进。
+```
+{  
+ "name": "Gopher",  
+ "title": "programmer",  
+ "address": {  
+  "home": "415.333.3333",  
+  "cell": "415.555.5555"  
+ }  
+}
+```
 
 ## io包
+
+所有实现了这两个接口的类型的值，都可以使用 io 包提供的所有功能，也可以用于其他包里接受这两个接口的函数以及方法。

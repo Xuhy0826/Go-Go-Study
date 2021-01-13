@@ -1,7 +1,10 @@
 package main
 
 func main() {
-
 	//logTest()
-	jsonTest()
+	//jsonTest()
+
+	//jsonDeserilizeTest()
+
+	jsonSerilizeTest()
 }

@@ -25,7 +25,7 @@ fmt.Println(curiosityMarkII) //{-4.9773 137.4283}	//原值不改变
 ```
 
 ## 使用type声明可复用的结构
-上一节使用struct的方式有点类似C#中的<font color=#0000FF size=72>**匿名类**</font>，更常用的使用方法应该还是声明好一个struct后可以到处复用。看实例
+上一节使用struct的方式有点类似C#中的<font color=#0000FF size=14>**匿名类**</font>，更常用的使用方法应该还是声明好一个struct后可以到处复用。看实例
 ```
 type location struct {
 	lat  float64
@@ -56,7 +56,7 @@ fmt.Printf("%+v\n", curiosity) //{lat:0 long:137.4283}
 ```
 
 ## Json序列化
-在Go语言中，通过json包中的Marshal()方法将数据编码成json格式。注意方法返回的是bytes类型Json数据，我们可以将其转为string类型再使用。
+在Go语言中，通过json包中的`Marshal()`方法将数据编码成json格式。注意方法返回的是bytes类型Json数据，我们可以将其转为string类型再使用。
 ```
 import (
 	"encoding/json"
