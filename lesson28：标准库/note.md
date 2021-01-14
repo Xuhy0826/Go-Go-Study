@@ -204,4 +204,50 @@ fmt.Println(string(data))
 
 ## io包
 
-io包可以以**流**的形式高效的处理数据，而不用考虑具体的数据是什么。io包中包含`io.Writer`和`io.Reader`这两个接口。所有实现了这两个接口的类型的值，都可以使用 io 包提供的所有功能，也可以用于其他包里接受这两个接口的函数以及方法。
+io包可以以**流**的形式高效的处理数据，而不用考虑具体的数据是什么。io包中包含`io.Writer`和`io.Reader`这两个接口。所有实现了这两个接口的类型的值，都可以使用 io 包提供的所有功能，也可以用于其他包里接受这两个接口的函数以及方法。   
+`io.Writer`的接口声明。只有一个`Write`方法，接收`[]byte`，返回写入的字节数和`error`。
+```
+//Write 从 p 里向底层的数据流写入 len(p)字节的数据。这个方法返回从 p 里写出的字节数（0 <= n <= len(p)），以及任何可能导致写入提前结束的错误。 Write 在返回 n < len(p)的时候，必须返回某个非 nil 值的 error。 Write 绝不能改写切片里的数据，哪怕是临时修改也不行
+type Writer interface {
+	Write(p []byte) (n int, err error)
+}
+```
+源码的注释中写明，`Write`方法的实现需要试图写入被传入的`byte`切片里的所有数据。**如果无法全部写入，那么该方法就一定会返回一个错误。**  
+接下来再看一下`Reader`接口的定义。只有一个`Read`方法，接收`[]byte`，返回读入的字节数和`error`。
+```
+type Reader interface {
+	Read(p []byte) (n int, err error)
+}
+```
+`Reader`接口的说明：
+1. 接口的实现需要试图读取数据来填满被传入的`byte`切片。允许出现读取的字节数小于 byte 切片的长度，并且如果在读取时已经读到数据但是数据不足以填满 byte 切片时，不应该等待新数据，而是要直接返回已读数据。
+2. 当读到最后一个字节时，可以有两种选择。一种是`Read`返回最终读到的字节数，并且返回`EOF`作为错误值，另一种是返回最终读到的字节数，并返回`nil`作为错误值。在后一种情况下，下一次读取的时候，由于没有更多的数据可供读取，需要返回 0 作为读到的字节数，以及`EOF`作为错误值。
+3. 调用`Read`时，会返回读取的字节数，都应该优先处理这些读取到的字节，再去检查 EOF 错误值或者其他错误值。
+4. 建议`Read`方法的实现永远不要返回 0 个读取字节的同时返回 nil 作为错误值。如果没有读到值，`Read`应该总是返回一个错误。  
+接下来看一个示例。
+```
+package main
+
+import (
+	"bytes"
+	"fmt"
+	"os"
+)
+
+func ioWriterTest() {
+	//（1）创建一个 Buffer 值，并将一个字符串写入 Buffer
+	// 因为 bytes.Buffer的类型指针 实现了 io.Writer 接口
+	var b bytes.Buffer
+	b.Write([]byte("Hello "))
+
+	//（2）使用 Fprintf 来将一个字符串拼接到 Buffer 里
+	// Fprintf 方法的第一个参数接收 io.Writer 接口
+	fmt.Fprintf(&b, "World!")
+
+	//（3）将 Buffer 的内容输出到标准输出
+	// os.Stdout 为 *File类型，*File也实现了 io.Writer 接口
+	b.WriteTo(os.Stdout)
+}
+```
+控制台输出：
+> Hello World!

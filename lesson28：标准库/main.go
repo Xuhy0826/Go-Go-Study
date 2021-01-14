@@ -6,5 +6,7 @@ func main() {
 
 	//jsonDeserilizeTest()
 
-	jsonSerilizeTest()
+	//jsonSerilizeTest()
+
+	ioWriterTest()
 }
