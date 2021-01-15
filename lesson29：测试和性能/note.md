@@ -98,3 +98,134 @@ func TestDownload02(t *testing.T) {
 	}
 }
 ```
+
+### mock测试
+模仿（mocking）是一个很常用的技术手段，用来在运行测试时**模拟**访问不可用的资源。
+```
+package unittest
+
+import (
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+)
+
+var feed = "hello gopher"
+
+// 模拟一个Web Server
+func mockServer() *httptest.Server {
+	f := func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "text/plain")
+		fmt.Fprintln(w, feed)
+	}
+	return httptest.NewServer(http.HandlerFunc(f))
+}
+
+func TestDownload03(t *testing.T) {
+	statusCode := http.StatusOK
+
+	// 创建模拟的Web Server
+	server := mockServer()
+	defer server.Close()
+
+	t.Log("Given the need to test downloading content.")
+	{
+		t.Logf("\tWhen checking \"%s\" for status code \"%d\"", server.URL, statusCode)
+		{
+			resp, err := http.Get(server.URL)
+			if err != nil {
+				t.Fatal("\t\tShould be able to make the Get call.", ballotX, err)
+			}
+			t.Log("\t\tShould be able to make the Get call.", checkMark)
+			defer resp.Body.Close()
+
+			if resp.StatusCode == statusCode {
+				t.Logf("\t\tShould receive a \"%d\" status. %v", statusCode, checkMark)
+			} else {
+				t.Errorf("\t\tShould receive a \"%d\" status. %v %v", statusCode, ballotX, resp.StatusCode)
+			}
+		}
+	}
+}
+```
+
+### 测试服务端点
+通过`httptest`包可以让我们自己模拟服务端点而不用真的去部署真实的服务端点来测试。比如说下面的示例，先实现一个简单的网络服务。
+> unittest/handlers/handlers.go
+```
+package handlers
+
+import (
+	"encoding/json"
+	"net/http"
+)
+
+// Routes 为网络服务设置路由
+func Routes() {
+	http.HandleFunc("/sendjson", func(rw http.ResponseWriter, r *http.Request) {
+		u := struct {
+			Name  string
+			Email string
+		}{
+			Name:  "xuhy",
+			Email: "xuhy@github.com",
+		}
+
+		rw.Header().Set("Content-Type", "application/json")
+		rw.WriteHeader(200)
+		json.NewEncoder(rw).Encode(&u)
+	})
+}
+```
+接下来就可以使用这个模拟的服务端来进行类似之前的测试了。
+> unittest/unittest04_test.go
+```
+package unittest
+
+import (
+	"demo29/unittest/handlers"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+)
+
+func init() {
+	handlers.Routes()
+}
+
+func TestSendJSON(t *testing.T) {
+	t.Log("Given the need to test the SendJSON endpoint.")
+	{
+		req, err := http.NewRequest("GET", "/sendjson", nil)
+		if err != nil {
+			t.Fatal("\t\tShould be able to make the Get call.", ballotX, err)
+		}
+		t.Log("\t\tShould be able to make the Get call.", checkMark)
+
+		rw := httptest.NewRecorder()
+		http.DefaultServeMux.ServeHTTP(rw, req)
+		if rw.Code != 200 {
+			t.Fatal("\tShould receive \"200\"", ballotX, rw.Code)
+		}
+		t.Log("\tShould receive \"200\"", checkMark)
+
+		u := struct {
+			Name  string
+			Email string
+		}{}
+
+		if err := json.NewDecoder(rw.Body).Decode(&u); err != nil {
+			t.Fatal("\tShould decode the response.", ballotX)
+		}
+		t.Log("\tShould decode the response.", checkMark)
+
+		t.Logf("\t response json data : %+v", u)
+	}
+}
+```
+
+综上，执行`go test -v`的结果类似下图。
+![示意图](https://github.com/Xuhy0826/Golang-Study/blob/master/resource/unittest.png)

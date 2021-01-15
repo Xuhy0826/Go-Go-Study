@@ -5,9 +5,6 @@ import (
 	"testing"
 )
 
-const checkMark = "\u2713" //对号（ √）
-const ballotX = "\u2717"   //叉号（× ）
-
 //TestDownload 测试函数需要满足：
 //(1) 公开的函数，并且以 Test 单词开头。
 //(2) 函数入参是一个指向 testing.T 类型的指针，并且没有返回值。
