@@ -158,6 +158,8 @@ func multiHandlerServer() {
 }
 ```
 现启动Server后，访问 http://localhost:8080/a 便会返回`Hello gopher from aHandler`，http://localhost:8080/b 便会返回`Hello gopher from bHandler`。  
+
+### 再回首
 如果现在回到开篇的第一个示例，可以发现这里用的并不是刚刚说的`http.Handle`方法，而是`http.HandleFunc`方法，这个方法的第一个参数和`http.Handle`方法一致，但是第二个参数是一个函数类型的参数。
 ```
 package main
