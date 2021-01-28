@@ -1,6 +1,9 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+	"time"
+)
 
 func main() {
 	//startDefaultServer()
@@ -8,6 +11,8 @@ func main() {
 	//startMyServer()
 
 	multiHandlerServer()
+
+	//http.ListenAndServe(":8080", http.FileServer(http.Dir("wwwroot")))
 }
 
 func startDefaultServer() {
@@ -51,6 +56,20 @@ func multiHandlerServer() {
 	http.Handle("/a", aHandler{})
 	http.Handle("/b", bHandler{})
 
+	//******* 几个内置的 handler ********
+	//404
+	http.Handle("/nowhere", http.NotFoundHandler())
+	//超时
+	http.Handle("/timeout", http.TimeoutHandler(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		time.Sleep(3 * time.Second)
+	}), 1*time.Second, "time out!!!"))
+	//跳转
+	http.Handle("/redirect", http.RedirectHandler("b", http.StatusSeeOther))
+
+	//文件服务器
+	//http.Handle("/files/", http.StripPrefix("/files", myFileServer{}))
+	http.Handle("/files/", http.StripPrefix("/files", http.FileServer(http.Dir("wwwroot"))))
+
 	server.ListenAndServe()
 }
 
@@ -64,4 +83,10 @@ type bHandler struct{}
 
 func (bh bHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	rw.Write([]byte("Hello gopher from bHandler"))
+}
+
+type myFileServer struct{}
+
+func (mfs myFileServer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+	http.ServeFile(rw, r, "wwwroot"+r.URL.Path)
 }
