@@ -115,7 +115,7 @@ func (h myHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 ```
 
 ### DefaultServeMux 是什么
-之前提到如果在创建`http.Server`时没有指定其`Handler`字段的值或赋`nil`值，那么便会使用`DefaultServeMux`作为`Handler`来处理请求。`DefaultServeMux`是一个默认的`ServeMux`，官方命名其为一个**多路复用器**，注意`DefaultServeMux`是实现了 `Handler` 接口的。
+之前提到如果在创建`http.Server`时没有指定其`Handler`字段的值或赋`nil`值，那么便会使用`DefaultServeMux`作为`Handler`来处理请求。`DefaultServeMux`是一个默认的`ServeMux`，`ServeMux`是一个结构体，其定义如下。官方命名其为**多路复用器**，并且`DefaultServeMux`也实现 `Handler` 接口的。
 > `DefaultServeMux`的定义
 ```
 var DefaultServeMux = &defaultServeMux
@@ -128,7 +128,7 @@ type ServeMux struct {
 	hosts bool       // whether any patterns contain hostnames
 }
 ```
-然而`DefaultServeMux`的正确打开方式是用来将对server的请求分发到不同的`Handler`的路由。我们首先知道`Handler`接口是用来处理请求，针对不同的请求地址应该制定不同的`Handler`进行处理，`DefaultServeMux`来作为前置的`Handler`来分发请求，所以相当于一个路由器，这也是为啥官方命名其为“多路复用器”的原因。  
+然而`DefaultServeMux`的正确打开方式是用来将对server的请求分发到不同的`Handler`的路由。我们首先知道`Handler`接口是用来处理请求，针对不同的请求地址应该制定不同的`Handler`进行处理，`DefaultServeMux`来作为前置的`Handler`来分发请求，所以相当于一个路由器，这也是“多路复用器”的含义。  
 ![DefaultServeMux路由请求到各个Handler](https://github.com/Xuhy0826/Golang-Study/blob/master/resource/httpHandler.png)
 
 ### 配置多个Handler
@@ -179,7 +179,29 @@ func multiHandlerServer() {
 }
 ```
 现启动Server后，访问 http://localhost:8080/a 便会返回`Hello gopher from aHandler`，http://localhost:8080/b 便会返回`Hello gopher from bHandler`。  
+当然，也可以不用`DefaultServeMux`自己创建一个`ServeMux`类型。可以使用http包提供的`NewServeMux()`函数。
+```
+package main
 
+import (
+	"net/http"
+	"time"
+)
+
+func main() {
+	//创建 ServeMux
+	mux := http.NewServeMux()
+
+	mux.Handle("/", aHandler{})
+
+	server := &http.Server{
+		Addr:    "localhost: 8080",
+		Handler: mux,
+	}
+	
+	server.ListenAndServe()
+}
+```
 ### 再回首
 如果现在回到开篇的第一个示例，可以发现这里用的并不是刚刚说的`http.Handle`方法，而是`http.HandleFunc`方法，这个方法的第一个参数和`http.Handle`方法一致，但是第二个参数是一个函数类型的参数。
 ```

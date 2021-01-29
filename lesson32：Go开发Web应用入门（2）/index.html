@@ -7,38 +7,45 @@
     <link rel="stylesheet" type="text/css" href="./node_modules/bootstrap/dist/css/bootstrap.min.css" />
     <style>
         body {
-            background: #b4e3f5
+            background: #d1f5dc
+        }
+
+        .main {
+            margin: 20px;
         }
     </style>
-    <title>Go开发Web应用（2）</title>
+    <title>Go开发Web应用入门（2）</title>
 </head>
 
 <body>
     <div class="main">
         <div class="container">
             <div class="col-lg-6">
-                <p class="h3">Registration</p>
-                <hr />
-                <form action="http://localhost:8080/register" method="post" enctype="application/x-www-form-urlencoded">
-                    <div class="form-group">
-                        <label for="emailTxt">Email address: </label>
-                        <input type="email" class="form-control" id="emailTxt" placeholder="Email">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-title h3">Registration</p>
+                        <form action="http://localhost:8080/register" method="post"
+                            enctype="application/x-www-form-urlencoded">
+                            <div class="form-group">
+                                <label for="emailTxt">Email address: </label>
+                                <input type="email" class="form-control" id="emailTxt" placeholder="Email">
+                            </div>
+                            <div class="form-group">
+                                <label for="userNameTxt">User Name</label>
+                                <input type="text" class="form-control" id="userNameTxt" placeholder="User Name">
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="checkOut"> Check me out
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
                     </div>
-                    <div class="form-group">
-                        <label for="userNameTxt">User Name</label>
-                        <input type="text" class="form-control" id="userNameTxt" placeholder="User Name">
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" name="checkOut"> Check me out
-                        </label>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
+                </div>
             </div>
         </div>
     </div>
-
 </body>
 
 </html>
