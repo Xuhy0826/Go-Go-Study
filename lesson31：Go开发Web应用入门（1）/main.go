@@ -53,6 +53,7 @@ func multiHandlerServer() {
 		Addr:    "localhost: 8080",
 		Handler: nil, //此时为 DefaultServeMux
 	}
+	http.Handle("/", indexHandler{})
 	http.Handle("/a", aHandler{})
 	http.Handle("/b", bHandler{})
 
@@ -71,6 +72,12 @@ func multiHandlerServer() {
 	http.Handle("/files/", http.StripPrefix("/files", http.FileServer(http.Dir("wwwroot"))))
 
 	server.ListenAndServe()
+}
+
+type indexHandler struct{}
+
+func (ih indexHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+	rw.Write([]byte("Hello gopher"))
 }
 
 type aHandler struct{}

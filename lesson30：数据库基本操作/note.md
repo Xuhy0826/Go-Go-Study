@@ -8,12 +8,12 @@ Go连接数据要用到的包
 
 #### 连接到数据库
 * 要连接到数据库，首先要加载数据库的驱动，驱动里包含与数据库交互的逻辑。
-* 方法：sql.Open("%数据库驱动名%", "%数据源名称%")，返回值是指向`sql.DB`的指针。
-* Open函数不会连接到数据库，并且不进行参数校验，只是将后续进行数据库操作的结构体给创建
+* 方法：`sql.Open("%数据库驱动名%", "%数据源名称%")`，返回值是指向`sql.DB`的指针。
+* `Open()`函数不会连接到数据库，并且不进行参数校验，只是将后续进行数据库操作的结构体给创建
 * 连接是懒加载的
-* sql.DB是线程安全的，多个goroutine可以同时操作
-* sql.DB不需要手动关闭
-* sql.DB是个抽象包含了数据库连接的池，并会自己进行维护
+* `sql.DB`是线程安全的，多个goroutine可以同时操作
+* `sql.DB`不需要手动关闭
+* `sql.DB`是个抽象包含了数据库连接的池，并会自己进行维护
 
 #### 如何获得驱动
 * `sql.Register("%数据库驱动名%", %实现了driver.Driver的结构体%)`
@@ -107,7 +107,7 @@ func updateEntity(entity testEntity) (newEntity testEntity, err error) {
 > * 预处理执行过程：
 > 1. 把SQL语句分成两部分，命令部分与数据部分。
 > 2. 先把命令部分发送给数据库服务端，数据库服务端进行SQL预处理。
-> 3. 然后把数据部分发送给MySQL服务端，数据库服务端对SQL语句进行占位符替换。
+> 3. 然后把数据部分发送给数据库服务端，数据库服务端对SQL语句进行占位符替换。
 > 4. 数据库服务端执行完整的SQL语句并将结果返回给客户端。
 > 
 > * 为什么需要 Prepare
@@ -117,7 +117,7 @@ func updateEntity(entity testEntity) (newEntity testEntity, err error) {
 ```
 func insertEntities(entityCollection []testEntity) (err error) {
 	sqlStr :=
-		`
+	`
 	INSERT INTO public.test(
 	id, msg, create_time
 	)

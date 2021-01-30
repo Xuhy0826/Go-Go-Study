@@ -49,18 +49,24 @@ type Handler interface {
 }
 ```
 `Handler`中的`ServeHTTP`方法，入参两个：
-* `ResponseWriter`，接口，用于写响应
+* `ResponseWriter`，接口类型，用来给我们写响应
 * `Request`指针，请求数据
 > `ResponseWriter`接口定义
 ```
 type ResponseWriter interface {
+	//返回响应的header，map类型，通过这个类型的Set方法来设置响应的header
     Header() Header
 
+	//将输入的内容写到相应的body中
     Write([]byte) (int, error)
 
+	//将传入的int值作为相应的状态码，默认会返回 http.StatusOK 作为相应状态，即200
+	//注意：此方法调用后无法在修改相应的header
     WriteHeader(statusCode int)
 }
 ```
+`ResponseWriter`这个接口接收的实际参数是`http.response`类型指针，`http.response`是一个未公开的结构体类型，并且`*http.response`上关联了`Header()`、`Write()`和`WriteHeader()`这三个方法。
+
 > `Request`结构的定义，未列全
 ```
 type Request struct {
@@ -123,13 +129,14 @@ var defaultServeMux ServeMux
 
 type ServeMux struct {
 	mu    sync.RWMutex
-	m     map[string]muxEntry
-	es    []muxEntry // slice of entries sorted from longest to shortest.
-	hosts bool       // whether any patterns contain hostnames
+	m     map[string]muxEntry	// 保存URL与Handler之间的映射
+	es    []muxEntry 			// slice of entries sorted from longest to shortest.
+	hosts bool       			// whether any patterns contain hostnames
 }
 ```
 然而`DefaultServeMux`的正确打开方式是用来将对server的请求分发到不同的`Handler`的路由。我们首先知道`Handler`接口是用来处理请求，针对不同的请求地址应该制定不同的`Handler`进行处理，`DefaultServeMux`来作为前置的`Handler`来分发请求，所以相当于一个路由器，这也是“多路复用器”的含义。  
 ![DefaultServeMux路由请求到各个Handler](https://github.com/Xuhy0826/Golang-Study/blob/master/resource/httpHandler.png)
+`ServeMux`结构包含了一个map，保存URL与`Handler`之间的映射。当`ServeMux`的`ServeHTTP`方法接收到请求，它会在这个map中查询出与请求URL最匹配的URL，随后调用与之相对应的`Handler`的`ServeHTTP`方法。
 
 ### 配置多个Handler
 当`Server`的`Handler`使用默认的`DefaultServeMux`时（即Handler字段不赋值或赋nil）。使用`http.Handle()`函数便可将自定义的`Handler`“注册”到`DefaultServeMux`，这样访问不同的url就可以使用不同的`Handler`来处理。  
@@ -143,8 +150,14 @@ func Handle(pattern string, handler Handler) {
 }
 ```
 可以看出，`http.Handle()`即是调用`DefaultServeMux`的`Handle()`方法。现通过`http.Handle()` 来向`DefaultServeMux`注册多个`Handler`。
-先定义两个`Handler`。
+先定义几个`Handler`。
 ```
+type indexHandler struct{}
+
+func (ih indexHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+	rw.Write([]byte("Hello gopher"))
+}
+
 type aHandler struct{}
 
 func (ah aHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
@@ -172,13 +185,15 @@ func multiHandlerServer() {
 		Addr:    "localhost: 8080",
 		Handler: nil, //此时为 DefaultServeMux
 	}
+	http.Handle("/", indexHandler{})
 	http.Handle("/a", aHandler{})
 	http.Handle("/b", bHandler{})
 
 	server.ListenAndServe()
 }
 ```
-现启动Server后，访问 http://localhost:8080/a 便会返回`Hello gopher from aHandler`，http://localhost:8080/b 便会返回`Hello gopher from bHandler`。  
+现启动Server后，访问 http://localhost:8080 便会返回`Hello gopher`，访问 http://localhost:8080/a 便会返回`Hello gopher from aHandler`，http://localhost:8080/b 便会返回`Hello gopher from bHandler`。  
+上面的例子中，被请求的URL都完美的匹配到了与多路复用器绑定的URL，如果访问`/random`或者`/a/test`会发生什么。首先匹配不成功的URL会根据URL层级进行下降，并最终落在根URL上。所以当访问 http://localhost:8080/random 时会将交给`indexHandler`来处理。而`/a/test`这个URL根据最小惊讶原则，我们估计会觉得会交给`aHandler`。但是实际上是`indexHandler`来处理的。产生这个现象的原因是上例中绑定`Handler`时是使用的`/a`而不是`/a/`。如果绑定的URL不用`/`结尾，那么会与完全相同的URL匹配。如果以`/`结果，那么才会匹配前缀。  
 当然，也可以不用`DefaultServeMux`自己创建一个`ServeMux`类型。可以使用http包提供的`NewServeMux()`函数。
 ```
 package main
@@ -192,7 +207,7 @@ func main() {
 	//创建 ServeMux
 	mux := http.NewServeMux()
 
-	mux.Handle("/", aHandler{})
+	mux.Handle("/", indexHandler{})
 
 	server := &http.Server{
 		Addr:    "localhost: 8080",
