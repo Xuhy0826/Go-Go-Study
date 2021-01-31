@@ -1,4 +1,4 @@
-# Golang搭建Web应用入门（1）
+# Golang搭建Web应用入门（1）：Handler
 
 ### 开门见山
 启动一个最简单的Web Server的示例。
@@ -57,32 +57,30 @@ type ResponseWriter interface {
 	//返回响应的header，map类型，通过这个类型的Set方法来设置响应的header
     Header() Header
 
-	//将输入的内容写到相应的body中
+	//用来将输入的内容写到相应的body中，注意入参的byte切片
     Write([]byte) (int, error)
 
 	//将传入的int值作为相应的状态码，默认会返回 http.StatusOK 作为相应状态，即200
-	//注意：此方法调用后无法在修改相应的header
+	//注意！！：此方法调用后无法在修改相应的header
     WriteHeader(statusCode int)
 }
 ```
-`ResponseWriter`这个接口接收的实际参数是`http.response`类型指针，`http.response`是一个未公开的结构体类型，并且`*http.response`上关联了`Header()`、`Write()`和`WriteHeader()`这三个方法。
+`ResponseWriter`这个接口接收的实际参数是指向`http.response`类型的指针，`http.response`是一个未公开的结构体类型，并且`*http.response`上关联了`Header()`、`Write()`和`WriteHeader()`这三个方法即实现了`ResponseWriter`接口。
 
-> `Request`结构的定义，未列全
+> `Request`结构的定义，列出一些主要的信息。
 ```
 type Request struct {
 	Host 			string
 	Method 			string
 	URL 			*url.URL
-	Header 			Header			//类型 map[string][]string
-	Body 			io.ReadCloser
-
-	Proto      		string 
-	ProtoMajor 		int
-	ProtoMinor 		int
-	
+	Header 			Header			//请求头，类型 map[string][]string
+	Body 			io.ReadCloser	//请求和响应的主体
 	ContentLength 	int64			//body内容的长度
+
+	// 表单数据：
 	Form 			url.Values
 	PostForm 		url.Values
+	MultipartForm	multipart.Form
 	...
 }
 ```
