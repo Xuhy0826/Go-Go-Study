@@ -127,9 +127,9 @@ var defaultServeMux ServeMux
 
 type ServeMux struct {
 	mu    sync.RWMutex
-	m     map[string]muxEntry	// 保存URL与Handler之间的映射
-	es    []muxEntry 			// slice of entries sorted from longest to shortest.
-	hosts bool       			// whether any patterns contain hostnames
+	m     map[string]muxEntry  // 保存URL与Handler之间的映射
+	es    []muxEntry           // slice of entries sorted from longest to shortest.
+	hosts bool                 // whether any patterns contain hostnames
 }
 ```
 然而`DefaultServeMux`的正确打开方式是用来将对server的请求分发到不同的`Handler`的路由。我们首先知道`Handler`接口是用来处理请求，针对不同的请求地址应该制定不同的`Handler`进行处理，`DefaultServeMux`来作为前置的`Handler`来分发请求，所以相当于一个路由器，这也是“多路复用器”的含义。  
@@ -181,7 +181,7 @@ func main() {
 func multiHandlerServer() {
 	server := http.Server{
 		Addr:    "localhost: 8080",
-		Handler: nil, //此时为 DefaultServeMux
+		Handler: nil,	//此时为 DefaultServeMux
 	}
 	http.Handle("/", indexHandler{})
 	http.Handle("/a", aHandler{})
@@ -191,7 +191,7 @@ func multiHandlerServer() {
 }
 ```
 现启动Server后，访问 http://localhost:8080 便会返回`Hello gopher`，访问 http://localhost:8080/a 便会返回`Hello gopher from aHandler`，http://localhost:8080/b 便会返回`Hello gopher from bHandler`。  
-上面的例子中，被请求的URL都完美的匹配到了与多路复用器绑定的URL，如果访问`/random`或者`/a/test`会发生什么。首先匹配不成功的URL会根据URL层级进行下降，并最终落在根URL上。所以当访问 http://localhost:8080/random 时会将交给`indexHandler`来处理。而`/a/test`这个URL根据最小惊讶原则，我们估计会觉得会交给`aHandler`。但是实际上是`indexHandler`来处理的。产生这个现象的原因是上例中绑定`Handler`时是使用的`/a`而不是`/a/`。如果绑定的URL不用`/`结尾，那么会与完全相同的URL匹配。如果以`/`结果，那么才会匹配前缀。  
+上面的例子中，被请求的URL都完美的匹配到了与多路复用器绑定的URL，如果访问`/random`或者`/a/test`会发生什么。首先匹配不成功的URL会根据URL层级进行下降，并最终落在根URL上。所以当访问 http://localhost:8080/random 时会将交给`indexHandler`来处理。而`/a/test`这个URL根据最小惊讶原则，我们估计会觉得会交给`aHandler`。但是实际上是`indexHandler`来处理的。产生这个现象的原因是上例中绑定`Handler`时是使用的`/a`而不是`/a/`。如果绑定的URL不用`/`结尾，那么会与完全相同的URL匹配。如果以`/`结尾，那么才会匹配前缀。  
 当然，也可以不用`DefaultServeMux`自己创建一个`ServeMux`类型。可以使用http包提供的`NewServeMux()`函数。
 ```go
 package main
@@ -329,7 +329,7 @@ func main() {
 	http.Handle("/files/", http.FileServer(http.Dir("wwwroot")))
 }
 ```
-但是只是这样写的话，http://localhost:8080/files/test.txt 会返回404状态。原因是当我们访问 http://localhost:8080/files/test.txt 时 handler 会使用设置的根目录路径（wwwroot）拼接上请求的url中的路径（/files/test.txt）即请求的其实是 http://localhost:8080/wwwroot/files/test.txt，这样当然会404。http包中的 `http.StripPrefix`函数便可解决这个问题。它可以帮助我们在使用某个handler时过滤掉url中的一些前缀。  
+但是只是这样写的话，http://localhost:8080/files/test.txt 会返回404状态。原因是当我们访问 http://localhost:8080/files/test.txt 时 handler 会使用设置的根目录路径（wwwroot）拼接上请求的url中的路径（/files/test.txt）即请求的其实是 http://localhost:8080/wwwroot/files/test.txt ，这样当然会404。http包中的 `http.StripPrefix`函数便可解决这个问题。它可以帮助我们在使用某个handler时过滤掉url中的一些前缀。  
 `http.StripPrefix`函数返回一个handler，入参有两个：
 * string类型，即需要过滤的路径前缀
 * Handler类型，即需使用的handler，在这里就是http.FileServer返回的handler  
