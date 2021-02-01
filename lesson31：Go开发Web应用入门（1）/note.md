@@ -133,7 +133,8 @@ type ServeMux struct {
 }
 ```
 然而`DefaultServeMux`的正确打开方式是用来将对server的请求分发到不同的`Handler`的路由。我们首先知道`Handler`接口是用来处理请求，针对不同的请求地址应该制定不同的`Handler`进行处理，`DefaultServeMux`来作为前置的`Handler`来分发请求，所以相当于一个路由器，这也是“多路复用器”的含义。  
-![DefaultServeMux路由请求到各个Handler](https://github.com/Xuhy0826/Golang-Study/blob/master/resource/httpHandler.png)
+![DefaultServeMux路由请求到各个Handler](https://github.com/Xuhy0826/Golang-Study/blob/master/resource/httpHandler.png)  
+
 `ServeMux`结构包含了一个map，保存URL与`Handler`之间的映射。当`ServeMux`的`ServeHTTP`方法接收到请求，它会在这个map中查询出与请求URL最匹配的URL，随后调用与之相对应的`Handler`的`ServeHTTP`方法。
 
 ### 配置多个Handler
