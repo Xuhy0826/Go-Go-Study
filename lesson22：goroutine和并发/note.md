@@ -4,7 +4,7 @@
 
 ## 启动goroutine
 在执行的操作之前加上一个`go`关键字即可，就是这么简单。看一个简单直接的例子。
-```
+```go
 import (
 	"fmt"
 	"time"
@@ -28,7 +28,7 @@ func main() {
 
 ## 启动多个goroutine
 每次使用`go`关键字都会创建一个新的`goroutine`。
-```
+```go
 import (
 	"fmt"
 	"time"
@@ -47,7 +47,7 @@ func main() {
 }
 ```
 带参数的函数，一样可以简单的使用go关键字启动goroutine。为了标记每个goroutine，接下来为函数传入一个id。
-```
+```go
 func sleepyGopher(id int) {
 	time.Sleep(time.Second * 3)
 	fmt.Println("...snore...", id)
@@ -79,7 +79,7 @@ func main() {
 * 通道（channel）可以在多个goroutine之间安全地传递值。可以类比想象成我们平时用的消息队列，可以向通道中写入值，可以从通道中取出值。   
 * 跟Go中的其他类型一样，可以将通道作为变量，传递至函数，结构中的字段。
 * 创建通道的方法：使用内置的`make`函数。并且还要指定相应的类型。
-```
+```go
 // 无缓冲的整型通道
 unbuffered := make(chan int)
 
@@ -95,7 +95,7 @@ buffered := make(chan string, 10)
 
 ### 无缓冲通道
 无缓冲的通道（ unbuffered channel） 是指在接收前没有能力保存任何值的通道。不论是向通道中写入值或者读取值，都会形成阻塞。比如发送操作会等待直到有另一个goroutine尝试对相同的通道执行读取操作为止。相同的，读取操作会等待直到有另一个goroutine尝试对相同的通道执行写入操作。
-```
+```go
 import (
 	"fmt"
 	"math/rand"
@@ -129,7 +129,7 @@ func main() {
 然而在很多时候，我们不希望程序一直阻塞在等待通道处。根据以往的经验，我们可以想到的是为这些等待设置超时时间。   
 Go提供了`time.After`函数来设置超时时间，`time.After`函数会返回一个通道，这个通道会在特定的时间后接收到一个值（由Go运行时发送）。如果我们不想程序一直等待所有的goroutine完成而设置一个超时时间，一个思路是让程序同时等待由`time.After`函数返回的计时通道和其他通道，如果计时通道的值返回了就不再去等待其他通道了。
 为了实现这个功能，Go提供的`select`语句很方便，其语法与`switch`很相似，某个case的准备就绪就会执行相应的操作。这样一来，我们就可以同时监视多个通道了。
-```
+```go
 timeout := time.After(2 * time.Second)
 for i := 0; i < 5; i++ {
 	select {
@@ -151,7 +151,7 @@ nil通道的存在并不是一无是处的，比如，一个包含select语句�
 
 #### 阻塞和死锁
 goroutine在等待和发送通道时会引起阻塞，等待时程序会一直监视通道啥时候来值。但是这种阻塞和那些空转死循环不一样，除了goroutine本身所占的少量资源外，goroutine并不消耗任何其他资源。当一个或多个goroutine因为某些永远无法发生的事情而被阻塞时，这就发生了**死锁**。
-```
+```go
 func main(){
 	c := make(chan, int)
 	<- c
@@ -160,7 +160,7 @@ func main(){
 
 ## 实践一下：流水线
 接下来做一个实例综合运用本节学的几个语法。用3个goroutine来形成一个流水线作业。
-```
+```go
 //上游
 func sourceGopher(downStream chan string) {
 	for _, v := range []string{"hello world", "a bad apple", "goodbye all"} {
@@ -194,7 +194,7 @@ func printGopher(upStream chan string) {
 	}
 }
 ```
-```
+```go
 func main() {
 	c1 := make(chan string)
 	c2 := make(chan string)
@@ -204,18 +204,18 @@ func main() {
 }
 ```
 上面的示例中我们是使用空字符串作为一个结束标志，但是这不是很稳定的做法。如果上游的字符串数组中包含一个空字符串，那么流程会被意外关闭。实际上更好的做法是使用`close`函数来关闭通道。
-```
+```go
 close(c1)
 ```
 如果向已关闭的通道执行写入会引发panic，读取已关闭的通道会得到相应的零值。   
 **【注意】** 如果在循环中读取一个已关闭的通道，并且没有检查该通道是否已关闭，那么这个循环会一直运转下去并消耗大量的性能。所以务必对可能关闭的通道检查是否关闭。   
 检查通道是否关闭的写法：
-```
+```go
 v, ok := <-c
 ```
 如果ok是false，那么说明通道c已关闭。   
 那么上游和中游的代码可以做如下优化
-```
+```go
 //上游
 func sourceGopher(downStream chan string) {
 	for _, v := range []string{"hello world", "a bad apple", "goodbye all"} {
@@ -243,7 +243,7 @@ func filterGopher(upStream, downStream chan string) {
 ```
 另外，由于“从通道中读取值，直到通道被关闭为止”这个操作很常用，所以Go提供了快捷的方法。使用`range`来读取通道，程序会在通道关闭前一直去获取通道的值。   
 这样一来，中游的代码可以再次优化。
-```
+```go
 func filterGopher(upStream, downStream chan string) {
 	//使用range来读取通道的值
 	for item := range upStream {
@@ -255,7 +255,7 @@ func filterGopher(upStream, downStream chan string) {
 }
 ```
 下游的代码同理
-```
+```go
 func printGopher(upStream chan string) {
 	//使用range来读取通道的值
 	for v := range upStream {

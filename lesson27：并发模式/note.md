@@ -9,7 +9,7 @@
 * 程序没有及时完成工作，“自杀”；
 * 接收到操作系统发送的中断事件，程序立刻试图清理状态并停止工作。
 首先`runner`结构中包含四个字段，其中有3个都是通道类型，用来辅助管理生命周期。
-```
+```go
 type Runner struct {
 	// tasks表示要执行的任务集合
 	tasks []func(int)
@@ -26,7 +26,7 @@ type Runner struct {
 ```
 interrupt 通道收发 os.Signal 接口类型的值，用来从主机操作系统接收中
 断事件。其中`os.Signal`接口类型是用来从主机操作系统中接收中断事件的。
-```
+```go
 type Signal interface {
     String() string
     Signal() 
@@ -35,7 +35,7 @@ type Signal interface {
 `complete`是一个收发`error`接口类型值的通道。当执行过程中发生错误会将错误传入通道。main函数便可获取错误。如果正常执行完任务，便返回一个nil值。  
 `timeout`是用来监视超时的通道。达到初始设定的超时时间，通道中可获取到值，此时runner便会终止任务。  
 下面，针对可能发生的错误类型预先定义好两个错误变量
-```
+```go
 // 超时的错误，这个错误值会在收到超时事件时返回
 var ErrTimeOut = errors.New("received timeout")
 
@@ -58,14 +58,14 @@ func New(d time.Duration) *Runner {
 但是 complete 通道被初始化为无缓冲的通道，是因为需要使用它来控制我们整个程序是否终止。
 接下来为Runner类型关联几个需要的方法。  
 （1）注册任务
-```
+```go
 // Add 为 Runner 添加任务。任务是一个接收一个int类型的ID作为参数的函数
 func (r *Runner) Add(tasks ...func(int)) {
 	r.tasks = append(r.tasks, tasks...)
 }
 ```
 （2）后台按顺序执行每个任务。但是在执行之前，会先调用`gotInterrupt`方法来检查是否有要从操作系统接收的事件。
-```
+```go
 // run 依次执行已注册的任务
 func (r *Runner) run() error {
 	for id, task := range r.tasks {
@@ -97,7 +97,7 @@ func (r *Runner) gotInterrupt() bool {
 ```
 值得注意的是，`gotInterrupt`方法中用到了带default分支的select语句。在没有default的select语句中，如果等待的几个通道都没有值的话就会阻塞。如果有default，通道都没有值的话，就会执行 default 分支。  
 （3）公开方法`Start`，开启runner执行
-```
+```go
 // Start 执行所有任务，并且监视通道事件
 func (r *Runner) Start() error {
 	//设置我们希望获取哪些系统信号
@@ -120,7 +120,7 @@ func (r *Runner) Start() error {
 ```
 `Start`方法中声明了一个匿名函数，并单独启动`goroutine`来执行。在 goroutine 的内部调用了`run`方法，并将这个方法返回的`error`接口值发送到`complete`通道。创建 goroutine 后，`Start`进入一个`select`语句，阻塞等待两个事件中的任意一个。如果从`complete`通道接收到`error`接口值，那么该 goroutine 要么在规定的时间内完成了分配的工作，要么收到了操作系统的中断信号。无论哪种情况，收到的`error`接口值都会被返回，随后方法终止。如果从`timeout`通道接收到`time.Time`值，就表示 goroutine 没有在规定的时间内完成工作。这种情况下，程序会返回`ErrTimeout`变量。  
 下面可以看到，在main.go中如何使用Runner来执行任务。
-```
+```go
 package main
 
 import (
@@ -164,7 +164,7 @@ func createTask() func(int) {
 ## pool
 pool包用于展示如何使用有缓冲的通道实现资源池，来管理可以在任意数量的goroutine之间共享及独立使用的资源。想想很多地方都会有资源池的实践，最常见的比如数据库的连接池，网络连接池。当一个goroutine需要从池中获取一个资源，可以向池中申请，使用完再归还到池中。  
 首先定义资源池的结构体，其中包含四个字段。
-```
+```go
 // Pool 管理一组可以安全地在多个goroutine间共享的资源。且资源必须实现了io.Closer接口
 type Pool struct {
 	//互斥锁
@@ -181,12 +181,12 @@ type Pool struct {
 }
 ```
 如果资源池已被关闭，再去请求池中的资源时会返回错误。预先定义好这个错误。
-```
+```go
 // ErrPoolClosed 描述一个请求已关闭池的错误
 var ErrPoolClosed = errors.New("Pool has been closed")
 ```
 定义资源池结构体的工厂函数，`New`函数
-```
+```go
 // New 创建一个用来管理资源的池。
 // 需要一个工厂函数并规定池的大小
 func New(fn func() (io.Closer, error), size uint) (*Pool, error) {
@@ -203,7 +203,7 @@ func New(fn func() (io.Closer, error), size uint) (*Pool, error) {
 显而易见，在创建资源池时要指定池的大小，并且指定生成资源的方法。   
 定义好结构体之后，接下来为其关联3个必要的方法，分别是`获取资源`,`释放资源`,`关闭资源池`。而且必须要做好线程安全。  
 （1）获取资源的方法`Acquire`
-```
+```go
 // Acquire 从池中获取资源
 func (p *Pool) Acquire() (io.Closer, error) {
 	select {
@@ -223,7 +223,7 @@ func (p *Pool) Acquire() (io.Closer, error) {
 }
 ```
 （2）释放资源的方法`Release`
-```
+```go
 // Release 释放资源，将使用后的资源放回池里
 func (p *Pool) Release(r io.Closer) {
 	//上锁，保证本操作与Close操作的安全
@@ -248,7 +248,7 @@ func (p *Pool) Release(r io.Closer) {
 }
 ```
 （3）关闭资源池的方法`Close`
-```
+```go
 // Close 会让资源池停止工作，并关闭所有现有的资源
 func (p *Pool) Close() {
 	//上锁，保证本操作与Release的安全
@@ -275,7 +275,7 @@ func (p *Pool) Close() {
 ```
 需要注意的是`Release`和`Close`方法使用同一个互斥锁上锁的，这样可以阻止这两个方法在不同 goroutine 里同时运行。
 看下如何在main.go中使用
-```
+```go
 package main
 
 import (
@@ -364,7 +364,7 @@ func performQueries(query int, p *pool.Pool) {
 ## work
 work包的场景是多个 goroutine 等待一个work工作队列中派发来的工作任务，这些goroutine拿到任务后并发执行，执行完工作的goroutine回来继续等等任务。在这种情况下，使用无缓冲的通道要比随意指定一个缓冲区大小的有缓冲的通道好，因为这个情况下既不需要一组 goroutine 配合执行，各干各的，来一个任务，任意一个goroutine领走去执行就完事了。  
 lesson24的练习其实就是这种场景。
-```
+```go
 package work
 
 import "sync"
@@ -411,7 +411,7 @@ func (p *Pool) Shutdown() {
 }
 ```
 接下来让看一下 main.go 如何使用。示例的工作任务很简单，只是打印出name字段。
-```
+```go
 // names 提供了一组用来显示的名字
 var names = []string{
 	"steve",

@@ -8,7 +8,7 @@
 * MultipartForm  
 
 前端代码先放一个Form，包含三个`<input>`标签。
-```
+```html
 <form action="http://localhost:8080/register" method="post"
     enctype="application/x-www-form-urlencoded">
     <div class="form-group">
@@ -31,7 +31,7 @@
 #### Form
 `Form`字段是`map[string][]string`类型，map的key是input标签的name属性，map的value是string切片类型，就以上的前端代码，存放的就是input标签的value属性。  
 读取前端提交来的Form中的数据可以在解析完后（r.ParseForm()），访问`Request`的`Form`字段或者使用`Request`的`FormValue()`方法来读取相应的值，`FormValue()`方法会返回切片的第一个值，即`request.Form["userName"][0]`和`request.FormValue("userName")`是等效的。
-```
+```go
 func main() {
 	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		//解析
@@ -66,7 +66,7 @@ checkbox checked : on
 
 #### PostForm
 如果现将表单的action改为`action="http://localhost:8080/register?userName=Admin"`，即QueryString中增加了一个与表单相同的key即userName。那么使用`request.Form`和`request.PostForm`读取数据的区别可见。
-```
+```go
 func main() {
 	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		//解析
@@ -95,12 +95,12 @@ map[checkOut:[on] email:[583209544@qq.com] userName:[123]]
 #### MultipartForm
 与`request.Form`不同，使用`request.MultipartForm`前的解析方法需换为使用`r.ParseMultipartForm()`来解析。
 > ParseMultipartForm的函数签名
-```
+```go
 func (r *Request) ParseMultipartForm(maxMemory int64) error
 ```
 `r.ParseMultipartForm()`需要传入一个int值来设定要读取的数据的长度。`request.MultipartForm`也不再是一个map类型，而是`multipart.Form`的指针类型，`multipart.Form`其实是一个struct。
 > formdata.go 中包含 multipart.Form 的类型声明
-```
+```go
 type Form struct {
 	Value map[string][]string
 	File  map[string][]*FileHeader
@@ -110,7 +110,7 @@ type Form struct {
 1. Value：放的都是表单里的字符串数据，那功能就和之前的r.PostForm差不多
 2. File：放的是文件数据  
 现将`<form>`中的编码类型改为`enctype="multipart/form-data`，并添加一个`<input id="avatarFile" type="file" name="avatar"/>`来上传文件
-```
+```html
 <form action="http://localhost:8080/register?userName=admin" method="post"
 enctype="multipart/form-data">
 	<div class="form-group">
@@ -135,7 +135,7 @@ enctype="multipart/form-data">
 </form>
 ```
 在服务端从MultipartForm.File中读取文件可使用Open方法。将表单中的文件数据保存到本地，下面有个示例。
-```
+```go
 package main
 
 import (
@@ -177,11 +177,11 @@ func main() {
 }
 ```
 其实如果单纯的读取上传的单独文件，可以直接使用`r.FormFile()`来获取。即可以将
-```
+```go
 fh := r.MultipartForm.File["avatar"][0]
 file, err := fh.Open()
 ```
 换成下面的写法。
-```
+```go
 file, _, err := r.FormFile("avatar")
 ```

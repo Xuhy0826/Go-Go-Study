@@ -5,7 +5,7 @@
 ### 基础单元测试
 看一个单元测试例子1。
 > unittest/unittest01_test.go
-```
+```go
 package unittest
 
 import (
@@ -52,7 +52,7 @@ func TestDownload(t *testing.T) {
 
 ### 表组测试
 表则测试的示例代码如下，就是将基础的单元测试进行不同条件多次测试。代码类似上一个示例，无需多言。
-```
+```go
 package unittest
 
 import (
@@ -101,7 +101,7 @@ func TestDownload02(t *testing.T) {
 
 ### mock测试
 模仿（mocking）是一个很常用的技术手段，用来在运行测试时**模拟**访问不可用的资源。
-```
+```go
 package unittest
 
 import (
@@ -154,7 +154,7 @@ func TestDownload03(t *testing.T) {
 ### 测试服务端点
 通过`httptest`包可以让我们自己模拟服务端点而不用真的去部署真实的服务端点来测试。比如说下面的示例，先实现一个简单的网络服务。
 > unittest/handlers/handlers.go
-```
+```go
 package handlers
 
 import (
@@ -181,7 +181,7 @@ func Routes() {
 ```
 接下来就可以使用这个模拟的服务端来进行类似之前的测试了。
 > unittest/unittest04_test.go
-```
+```go
 package unittest
 
 import (

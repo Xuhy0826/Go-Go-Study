@@ -5,7 +5,7 @@
 
 ### 将指针用作形参
 通过前面的学习我们知道函数是以传值的方式传递形参的。
-```
+```go
 type person struct {
 	name string
 	age  int
@@ -28,7 +28,7 @@ func main() {
 }
 ```
 但当指针被被传递至函数时，函数将接收到传入内存地址的副本，在此之后函数就可以通过解引用内存地址来修改指针指向的值。
-```
+```go
 func birthday(p *person) {
 	p.age++
 }
@@ -43,7 +43,7 @@ fmt.Println(jack.age) //13
 ```
 ### 指针接收者
 与形参的写法类似，将指针用作方法接收者时，便可以实现对接收者字段的修改，看示例。
-```
+```go
 func (p *person) birthday() {
 	p.age++
 }
@@ -59,7 +59,7 @@ func main() {
 }
 ```
 其实，就算在声明struct时不写`&`，仍然可以正常运行。因为Go在变量通过点标记调用方法是会自动使用&取得变量的内存地址。
-```
+```go
 func (p *person) birthday() {
 	p.age++
 }
@@ -78,7 +78,7 @@ func main() {
 
 ### 内部指针
 Go提供了叫做**内部指针**的特性，来确定struct中的指定的字段的内存地址。
-```
+```go
 type stats struct {
 	level             int
 	endurance, health int
@@ -106,7 +106,7 @@ func main() {
 
 ### 修改数组
 虽然前面说Go中更倾向于使用切片而不是数组，但是也难免会遇到使用数组更加合理的情况。同样使用指针也可以实现对数组元素进行修改的方法。
-```
+```go
 func reset(board *[8][8]rune){
     board[0][0] = 'r'
 }
@@ -135,7 +135,7 @@ func main(){
 
 ## 指针和接口
 直接看例子，和接口那节用到的一样
-```
+```go
 type talker interface {
 	talk() string
 }
@@ -159,7 +159,7 @@ func main(){
 }
 ```
 如果方法使用的是指针接收者，那么情况就不同了。
-```
+```go
 type laser struct{}
 
 func (l *laser) talk() string {

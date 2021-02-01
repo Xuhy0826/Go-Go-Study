@@ -49,7 +49,7 @@ Go连接数据要用到的包
 * * func(re *Rows) Next() bool
 * * func(re *Rows) NextResultSet() bool
 * * func(re *Rows) Scan(dest ...interface{}) error  //将查到的数据一一赋值到Scan的入参中，有点类似RowMapper功能
-```
+```go
 func queryByDate(minDate time.Time) (entityCollection []testEntity, err error) {
 	sqlStr := "SELECT id, msg, create_time FROM public.test where create_time > $1"
 	rows, err := db.Query(sqlStr, minDate)
@@ -72,7 +72,7 @@ func queryByDate(minDate time.Time) (entityCollection []testEntity, err error) {
 * `Row`的方法
 * * func(re *Row) Err() error
 * * func(re *Row) Scan(dest ...interface{}) error
-```
+```go
 func queryByID(id int) (entity testEntity, err error) {
 	entity = testEntity{}
 	sqlStr := "select t.id, t.msg, t.create_time from public.test t where t.id = $1"
@@ -84,7 +84,7 @@ func queryByID(id int) (entity testEntity, err error) {
 #### Exec
 执行命令，直接看例子简单明了
 * 返回类型：`type Result struct{}`
-```
+```go
 func updateEntity(entity testEntity) (newEntity testEntity, err error) {
 	sqlStr := "UPDATE public.test SET msg=$1, create_time=$2 WHERE id=$3"
 	_, err = db.Exec(sqlStr, entity.msg, time.Now(), entity.id)
@@ -114,7 +114,7 @@ func updateEntity(entity testEntity) (newEntity testEntity, err error) {
 > 1. 优化数据库服务器重复执行SQL的方法，可以提升服务器性能，提前让服务器编译，一次编译多次执行，节省后续编译的成本。
 > 2. 避免SQL注入问题
 
-```
+```go
 func insertEntities(entityCollection []testEntity) (err error) {
 	sqlStr :=
 	`
@@ -149,7 +149,7 @@ func insertEntities(entityCollection []testEntity) (err error) {
 2. 执行操作：`tx.Exec()` 或 `tx.Query()`等
 3. 提交事务：`tx.Commit()`
 4. 回滚：`tx.Rollback()`
-```
+```go
 func execByTransaction(entity testEntity) (err error) {
 	tx, err := db.Begin() //开启事务
 	if err != nil {

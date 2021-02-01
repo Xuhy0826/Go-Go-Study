@@ -22,7 +22,7 @@
 
 * 可变参数函数
 例如常用的Println函数，它可以接收一个参数、两个参数或更多参数。并且它可以接收不同类型的参数
-```
+```go
 fmt.Println("Hello","World")
 fmt.Println(186, "seconds")
 ```
@@ -33,7 +33,7 @@ fmt.Println(186, "seconds")
 > 所以，...和interface{}结合到一起，就可以接收任意数量任意类型的参数
 
 * 最后写两个例子
-```
+```go
 package main
 
 import (

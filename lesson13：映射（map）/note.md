@@ -7,7 +7,7 @@
 > **map[string]int**
 
 对map的读写操作和其他语言中的字典操作很类似，简单过一下
-```
+```go
 //声明map，使用复合字面量的声明方式
 temperature := map[string]int{
     "Mars":  -65,
@@ -27,7 +27,7 @@ fmt.Println(temperature) //map[Earth:15 Mars:16 Vemus:464]
 fmt.Println(temperature["Moon"]) //0
 ```
 Go语言中提供了一种 **“逗号与ok”**（名字有点诡异）的写法来简化代码语法，看例子
-```
+```go
 if moon, ok := temperature["Moon"]; ok {
     fmt.Printf("On avarage the Earth is %v C \n", moon)
 } else {
@@ -38,7 +38,7 @@ if moon, ok := temperature["Moon"]; ok {
 
 ## map是不会被复制的
 之前的基本类型与数组不同，在被赋值给新的变量或者传递给函数或方法时都会创建新的副本。而map则不同，不管是赋值还是当做函数的参数，都是会共享底层数据的（简单理解成都是传引用）。看例子
-```
+```go
 planets := map[string]string{
     "Earth": "Sector ZZ9",
     "Mars":  "Sector ZZ9",
@@ -50,7 +50,7 @@ fmt.Println(planetsMarkII) //map[Earth:Whoops Mars:Sector ZZ9]
 ```
 planets改变，相应的planetsMarkII也是改变的，因为它们指向同一块内存。
 * 使用delete方法可以删除map中的元素，例子接上
-```
+```go
 delete(planets, "Earth")
 delete(planets, "Moon")    //移除不存在的元素，不会引发panic
 fmt.Println(planets)       //map[Mars:Sector ZZ9]
@@ -60,14 +60,14 @@ fmt.Println(planetsMarkII) //map[Mars:Sector ZZ9]
 
 ## 使用make函数对map进行预分配
 声明map有两种方法，一种是之前用过的复合字面量，另一种就是使用make函数。make函数可以接收一个或两个参数，第二个参数用于指定键的数量来预分配空间。看实例。
-```
+```go
 temperature := make(map[float64]int, 8)
 ```
 为map指定初始大小能够在map变大时减少一些后续操作。
 
 ## 使用映射和切片实现数据分组
 看实例吧，就是map和切片的一个综合应用。需要注意的是：对于映射而言，range 返回的不是索引和值，而是键值对。
-```
+```go
 temperatures := []float64{
     -28.0, 32.0, -31.0, -29.0, -23.0, -28.0, -33.0,
 }
@@ -94,7 +94,7 @@ for g, temperatures := range groups {
 ## 最后注意一点
 在Go中map中的数据是无序的，如果要排序map中的值，一般会把map转成切片，在调用内置方法对切片进行排序来完成。   
 【示例：将切片去重并排序，在Go中没有set，但是可以使用map来实现set的功能】
-```
+```go
 numbers := []float64{
     51.02, 10.2, -5.2, -10.4, 14.2, 10.2, 5.12, 51.02, -30.0, 4.3,
 }

@@ -2,14 +2,14 @@
 
 之前都接触过，一个包中命名是大写字母开头的标识符是公开的(public)，被包外的代码可见。以小写字母开头的是未公开的(private)，则包外的代码不可见。如下示例
 > demo/counters/counters.go
-```
+```go
 package counters
 
 //声明了未公开的类型
 type alertCounter int
 ```
 > demo/main.go
-```
+```go
 package main
 
 import (
@@ -27,7 +27,7 @@ func main() {
 ```
 由于counters包里的`alertCounter`是小写字母开头，所以该变量是未公开的，包外无法访问。如果改为`AlertCounter`则不会产生编译错误了。另一个办法则是为其定义构造函数的方式，如下示例将counters包里的实现改为工厂模式。
 > demo/counters/counters.go
-```
+```go
 package counters
 
 //声明了未公开的类型
@@ -39,7 +39,7 @@ func New(value int) alertCounter {
 }
 ```
 > demo/main.go
-```
+```go
 package main
 
 import (
@@ -66,7 +66,7 @@ func main() {
 #### 可见标识符
 再看一个例子
 > demo/entities/entities.go
-```
+```go
 package entities
 
 // User 在程序里定义一个用户类型
@@ -76,7 +76,7 @@ type User struct {
 }
 ```
 > demo/main.go
-```
+```go
 package main
 
 import (
@@ -95,7 +95,7 @@ func main() {
 ```
 很好理解，因为结构entities的字段`email`是小写字母开头，所以该字段是未公开的。相反`Name`则是公开的。如果将`email`改为`Email`，则代码便可正常编译。如果继续将entities中的代码做如下修改。
 > demo/entities/entities.go
-```
+```go
 package entities
 
 // user 在程序里定义一个用户类型
@@ -112,7 +112,7 @@ type Admin struct {
 ```
 将`User`改为`user`，即改为未公开类型。再声明多一个公开类型`Admin`，嵌入一个未公开的`user`类型。此时main函数再做如下调整。
 > demo/main.go
-```
+```go
 package main
 
 import (

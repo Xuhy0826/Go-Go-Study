@@ -2,13 +2,13 @@
 
 ## 接口类型
 和其他常见的编程语言一样，Go也有接口，并且其含义是类似的。类型通过方法表达自己的行为，而接口通过规定类型必须满足的方法来声明。首先如何声明接口。
-```
+```go
 var t interface {
 	talk() string
 }
 ```
 无论什么类型，只要存在满足接口的方法，就能成为变量`t`的值。
-```
+```go
 //满足接口t（1）
 type martian struct{}
 
@@ -34,7 +34,7 @@ func main() {
 ```
 martian和laser两个完全不同的类型都关联了一个空入参且返回参数为string的`talk`方法，那么它们就都可以被赋值给变量`t`。
 * 为了复用，一般会将接口声明为类型。按照惯例，接口类型的名称常常以`-er`作为后缀。举个例子
-```
+```go
 ···
 
 type talker interface{
@@ -53,7 +53,7 @@ func main() {
 }
 ```
 上一节学习了struct嵌入的特性，下面将满足接口的类型嵌入另一个struct中
-```
+```go
 ···
 
 type starship struct {
@@ -70,7 +70,7 @@ func main() {
 
 ## 探索接口
 先顺路看一下Go的时间类型。需要引入time包。
-```
+```go
 //顺路探究下时间类型
 t := time.Now()
 fmt.Println(t) //2020-11-23 22:51:33.8848173 +0800 CST m=+0.003079501
@@ -102,7 +102,7 @@ func main() {
 ```
 但是现在就存在一个问题了，这个函数只能将“地球时间”进行转换，因为入参类型是固定的`time.Time`。为了达到通用性来解决这个问题，就可以使用接口。   
 先声明接口。
-```
+```go
 type xstadater interface {
 	YearDay() int
 	Hour() int
@@ -115,7 +115,7 @@ func xstardate(t xstadater) float64 {
 }
 ```
 这样定义后方法`xstardate`就具有通用性了，比如现在其他星球的时间只要具有`YearDay()`和`Hour()`就可以进行转换。
-```
+```go
 type marsTime int
 
 func (s marsTime) YearDay() int {
@@ -142,13 +142,13 @@ Go标准库导出了很多只有单个方法的接口，可以在自己的代码
 > Go通过简单的、通常只有单个方法的接口······来鼓励组合而不是继承，这些接口在各个组件之间形成了简明易懂的界限。 —— Rob Pike   
 
 比如fmt包就声明了以下所示的Stringer接口:
-```
+```go
 type Stringer interface{
 	String() string
 }
 ```
 这样一来，只要一个类型关联了`String`方法，那么它的返回值就能够为`Println`，`Sprintf`等函数所用。
-```
+```go
 type location struct{
 	lat, long float64
 }
@@ -166,7 +166,7 @@ func main() {
 ## 嵌入类型和接口的实现
 由于Golang的嵌入类型的方法提升，如果内部类型实现了接口，那么外部类型也可以“间接”实现接口。看下面的示例
 
-```
+```go
 package main
 
 import{

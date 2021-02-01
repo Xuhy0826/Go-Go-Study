@@ -12,7 +12,7 @@
 
 ## Hello world
 第一段程序
-```
+```go
 package main
 
 import "fmt"
@@ -29,7 +29,7 @@ func main() {
 小试一下Go中的一些语法，不系统的学习什么特定的概念，随手尝试一下Go中的一些简单命令，对Go的风格有个第一映像
 #### 几种输出控制台方法
 Golang中的几种控制台输出方法，类似其他语言的`Console.Write()`。常用的几种是`fmt.Println()`, `fmt.Print()`, `fmt.Printf()`；
-```
+```go
 //打印后不换行
 fmt.Print("Hello world \n") //Hello world
 
@@ -38,7 +38,7 @@ fmt.Println("123456")              //123456
 fmt.Println("hello", "world", "!") //hello world !
 ```
 使用Printf函数输出格式化的输出
-```
+```go
 var s = "hi"
 fmt.Printf("%s guys\n", s) //hi guys
 fmt.Printf("%v guys\n", s) //hi guys
@@ -46,7 +46,7 @@ var i = 20
 fmt.Printf("i am %v years old\n", i) //i am 20 years old
 ```
 调整输出的对齐格式，使用%后跟数字和v的方式，中间的数字就表示这个占位符的长度，正数表示靠右对齐，负数表示靠左对齐
-```
+```go
 fmt.Printf("%-15v %6v\n", "abcdefghijklmno", "123") //abcdefghijklmno    123
 fmt.Printf("%-15v %6v\n", "abcdefg", "123456")      //abcdefg         123456
 fmt.Printf("%-15v %6v\n", "一二三四五六七八九", "123456")    //一二三四五六七八九       123456
@@ -56,7 +56,7 @@ Golang中包含类似的常用基本类型：int，float，double，bool等
 
 #### 常量和变量
 const声明常量，var声明变量。Golang中特有的短声明才是常用的写法，后面再议。
-```
+```go
 const width = 10
 var height = 5
 var distance, speed = 5600000, 10080

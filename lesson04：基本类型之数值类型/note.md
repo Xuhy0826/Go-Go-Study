@@ -6,7 +6,7 @@
 go语言中有两种浮点类型：
 1. float64（占8字节内存）,默认的浮点类型，就是说不显式地指定float32，都是使用float64来定义一个带小数点的变量
 2. float32（占4字节内存）
-```
+```go
 days := 365.2425    //短声明，days会被Go编译器推断为浮点类型默认的float64类型
 如果需要使用float32，我们必须指定类型
 var pi64 = math.Pi      
@@ -20,7 +20,7 @@ price := 0.0
 
 ### 格式化输出浮点值
 格式化输出需要使用到fmt.Printf()函数：
-```
+```go
 fmt.Printf("%f\n", third)     //0.333333
 fmt.Printf("%.2f\n", third)   //0.33，.2f就是表示小数点后保留2位
 fmt.Printf("%4.2f\n", third)  //0.33，4.2f表示总宽（长）度为4，小数点后保留2位
@@ -30,17 +30,17 @@ fmt.Printf("%05.2f\n", third) //00.33，05.2f表示总宽（长）度为5，小�
 ### 浮点类型的精确性
 由于计算机只能通过0和1来表示浮点数，所以浮点数会经常受到舍入错误的影响
 比如：
-```
+```go
 piggyBank := 0.1
 piggyBank += 0.2
 fmt.Println(piggyBank) //0.30000000000000004
 ```
 由上面提到的浮点类型的精确度问题，就会导致浮点数的比较
-```
+```go
 fmt.Println(piggyBank == 0.3) //false
 ```
 一个折中的解决方案就是使用一定精确度来判断是否相等
-```
+```go
 fmt.Println(math.Abs(piggyBank-0.3) < 0.0001) //true
 ```
 
@@ -64,13 +64,13 @@ Go中提供了10种整数类型，根据不同的大小和是否有符号分为
 【例】：使用uint8来表示颜色rgb值，是个很好的选择：
 * （1）能将变量限制在合法的范围之内
 * （2）对于未压缩的图片这种需要按顺序存储大量颜色的场景，可以极大的节省空间
-```
+```go
 var red, green, blue uint8 = 0, 141, 213
 fmt.Printf("color：#%02x%02x%02x;", red, green, blue) //color：#008dd5;
 ```
 ### 回绕（wrap around）
 整数类型不会有浮点类型的精度问题，但是存在自己的回绕问题。就是整数类型在达到自己的边界值（最大值或最小值），再向边界外延伸时，会回到最小值或最大值。例如一个uint8，它的最大值应该是255，此时再进行加1操作后，值就变成了0。其实只要知道整型在计算机中的二进制存储方式，这个事情还是很好理解的。
-```
+```go
 var numberA uint8 = 255	//到达类型最大值
 numberA++
 fmt.Println(numberA)	//0	环绕
@@ -78,7 +78,7 @@ fmt.Println(numberA)	//0	环绕
 ## 大数
 顾名思义，就是特别大的数，一般情况下，比较大的数我们也可使用简便写法
 表示方法（类似科学计数法）：
-```
+```go
 var distance int64 = 41.3e12    //就是41.3 * 10<sup>12</sup>
 ```
 但是如果需要使用超过uint64上限的数时，Go为我们提供了big包来解决问题，引用时包名为："math/big"。
@@ -90,11 +90,11 @@ var distance int64 = 41.3e12    //就是41.3 * 10<sup>12</sup>
 
 #### big.Int的创建方式有两种
 1. 使用big.NewInt(int val)的方法
-```
+```go
 lightSpeed := big.NewInt(299792)
 ```
 2. 使用big.SetString(string val, 10)的方法，其中“10”表示参数1这个字符串是个10进制的数
-```
+```go
 distance := new(big.Int)
 distance.SetString("24000000000000000000000", 10)
 ```
@@ -102,7 +102,7 @@ distance.SetString("24000000000000000000000", 10)
 
 ### 大数在常量中的表现
 和变量不同，当我们不为常量指定类型，并直接为其赋值一个很大的数，Go会直接将其标记为无类型（untyped）而不会引发溢出异常，并且可以在程序中正常使用
-```
+```go
 const distance = 240000000000000000000000
 fmt.Println("Andromeda Galaxy is ", distance/299792/86400)
 ```

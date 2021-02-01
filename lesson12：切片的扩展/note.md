@@ -3,14 +3,14 @@
 ## append函数
 
 * append是内置函数，可以将元素添加到切片中
-```
+```go
 dwarfs := []string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris"}
 //使用append函数为切片增加元素
 dwarfs = append(dwarfs, "Orcus")
 fmt.Println(dwarfs) //	[Ceres Pluto Haumea Makemake Eris Orcus]
 ```
 * 如果切片是从数组的中间切了一部分出来（没切到最后），这时调用append函数，会替换切片之后的原数组元素。看例子比较清楚
-```
+```go
 dwarfs := []string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris", "Orcus"}
 dwarfsSlice := dwarfs[2:4]
 dwarfsSlice = append(dwarfsSlice, "EEEE")	//这时使用append会将原数组的元素“Eris”替换掉
@@ -18,14 +18,14 @@ fmt.Println(dwarfsSlice)  //[Haumea Makemake EEEE]
 fmt.Println(dwarfs)       //[Ceres Pluto Haumea Makemake EEEE Orcus]
 ```
 * append函数是一个可变参数的函数
-```
+```go
 dwarfs := []string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris"}
 
 dwarfs = append(dwarfs, "Salacia", "Quaoar", "Sedna")
 fmt.Println(dwarfs) //	[Ceres Pluto Haumea Makemake Eris Salacia Quaoar Sedna]
 ```
 * append函数可直接拼接切片
-```
+```go
 // 创建两个切片，并分别用两个整数进行初始化
 s1 := []int{1, 2}
 s2 := []int{3, 4}
@@ -42,7 +42,7 @@ fmt.Printf("%v\n", append(s1, s2...))   //[1 2 3 4]
 2. 容量: k - i   
 
 获取切片的长度或者容量，Go都已有内置的函数**len()**和**cap()**。
-```
+```go
 package main
 
 import (
@@ -65,7 +65,7 @@ func main() {
 ## 再探append函数
 
 先看下示例
-```
+```go
 dwarfsRaw := [...]string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris"}
 dwarfs1 := dwarfsRaw[:]                                  //length=5， capacity=5
 dwarfs2 := append(dwarfs1, "Orcus")                      //length=6， capacity=10
@@ -82,7 +82,7 @@ fmt.Println(dwarfsRaw) //[Ceres Pluto Haumea Makemake Eris]
 可以看出，当为切片调用append函数追加元素时，若切片的容量够，则直接追加。若切片的容量不够，Go会将当前切片的底层数组复制到一个新的数组中，新数组的长度是原数组的两倍大。
 ![示意图](https://github.com/Xuhy0826/Golang-Study/blob/master/resource/AppendFunc.png)
 上面的例子中还有一个值得注意的地方，如果我们修改dwarfs3中的元素，dwarfs1不会受影响，而dwarfs2会相应的改变。
-```
+```go
 dwarfs3[1] = "A"
 dump("dwarfs1", dwarfs1) //dwarfs1: length 5, capacity 5 [Ceres Pluto Haumea Makemake Eris]
 dump("dwarfs2", dwarfs2) //dwarfs2: length 6, capacity 10 [Ceres A Haumea Makemake Eris Orcus]
@@ -91,7 +91,7 @@ dump("dwarfs2", dwarfs2) //dwarfs2: length 6, capacity 10 [Ceres A Haumea Makema
 ## 使用3个索引来切分数组
 * Go支持使用3个索引来切片，第三个索引是用来“限制切片的容量”。   
 比如
-```
+```go
 source := []string{"Apple", "Orange", "Plum", "Banana", "Grape"}
 slice := source[2:3:4]
 ```
@@ -101,7 +101,7 @@ slice := source[2:3:4]
 2. 容量: k – i 或 4 - 2 = 2   
 
 再看一个稍微复杂的例子体会一下。
-```
+```go
 planets := []string{"Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"}
 terrestrial := planets[0:4:4]
 terrestrial1 := planets[0:4]
@@ -120,7 +120,7 @@ dump("worlds", worlds)           //worlds: length 5, capacity 8 [Mercury Venus E
 当切片的容量不足以执行append时，会创建一个新的数组并进行复制。但是如果使用make函数来声明切片则可以自定义切片的长度和容量。
 * make(类型，长度，容量)
 * make(类型，长度和容量)
-```
+```go
 dwarfsWithMake := make([]string, 0, 10)
 dwarfsWithMake = append(dwarfsWithMake, "Ceres", "Pluto", "Haumea", "Makemake", "Eris")
 dump("dwarfsWithMake", dwarfsWithMake) //dwarfsWithMake: length 5, capacity 10 [Ceres Pluto Haumea Makemake Eris]
@@ -132,7 +132,7 @@ dump("dwarfsWithMake", dwarfsWithMake) //dwarfsWithMake: length 5, capacity 10 [
 * 声明可变参数的语法是在参数类型前面加上“...”即可
 * 此时参数类型实际上是一个切片类型
 * 调用可变参数函数时传递的是多个参数，如果想传入切片，则需要在切片后加上“...”，这样是表示将切片展开
-```
+```go
 //声明一个新的切片，切片的内容是将传入的切片元素前加上前缀，前缀是该函数的第一个参数
 func terraform(prefix string, worlds ...string) []string {
 

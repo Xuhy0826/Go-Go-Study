@@ -2,7 +2,7 @@
 
 ### 开门见山
 启动一个最简单的Web Server的示例。
-```
+```go
 package main
 
 import "net/http"
@@ -26,7 +26,7 @@ func startDefaultServer() {
 运行后访问 http://localhost:8080 即可看到响应。  
 `http.ListenAndServe("localhost:8080", nil)`实际上是创建一个`http.Server`并调用其`ListenAndServe()`函数，此时便可启动监听。方法的第一个入参指定网络地址，第二个入参是指定`Server`的`Handler`，也就是请求的处理器。处理器能够来定义如何处理接收的请求。如果这个参数传递的是`nil`，那么就会使用一个默认的`Handler`，即`DefaultServeMux`。
 > `http.Server` 结构定义
-```
+```go
 type Server struct {
     //指定网络地址，为空则默认为“*:80"
 	Addr string
@@ -36,14 +36,14 @@ type Server struct {
 }
 ```
 > `ListenAndServe()`函数声明，内容先不细究
-```
+```go
 func (srv *Server) ListenAndServe() error {
 	....
 }
 ```
 启动监听后，当收到请求，会使用`Server`的`Handler`接口的`ServeHTTP`方法来处理请求。
 `Handler`是一个接口，定义如下
-```
+```go
 type Handler interface {
 	ServeHTTP(ResponseWriter, *Request)
 }
@@ -52,7 +52,7 @@ type Handler interface {
 * `ResponseWriter`，接口类型，用来给我们写响应
 * `Request`指针，请求数据
 > `ResponseWriter`接口定义
-```
+```go
 type ResponseWriter interface {
 	//返回响应的header，map类型，通过这个类型的Set方法来设置响应的header
     Header() Header
@@ -68,7 +68,7 @@ type ResponseWriter interface {
 `ResponseWriter`这个接口接收的实际参数是指向`http.response`类型的指针，`http.response`是一个未公开的结构体类型，并且`*http.response`上关联了`Header()`、`Write()`和`WriteHeader()`这三个方法即实现了`ResponseWriter`接口。
 
 > `Request`结构的定义，列出一些主要的信息。
-```
+```go
 type Request struct {
 	Host 			string
 	Method 			string
@@ -87,7 +87,7 @@ type Request struct {
 通过`Request`这个结构，就可以获取本次请求的很多信息，这些属性名都是一目了然的。  
 
 现在，了解这些之后，自定义一个`Server`和`Handler`来监听并处理请求。
-```
+```go
 package main
 
 import "net/http"
@@ -121,7 +121,7 @@ func (h myHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 ### DefaultServeMux 是什么
 之前提到如果在创建`http.Server`时没有指定其`Handler`字段的值或赋`nil`值，那么便会使用`DefaultServeMux`作为`Handler`来处理请求。`DefaultServeMux`是一个默认的`ServeMux`，`ServeMux`是一个结构体，其定义如下。官方命名其为**多路复用器**，并且`DefaultServeMux`也实现 `Handler` 接口的。
 > `DefaultServeMux`的定义
-```
+```go
 var DefaultServeMux = &defaultServeMux
 var defaultServeMux ServeMux
 
@@ -139,7 +139,7 @@ type ServeMux struct {
 ### 配置多个Handler
 当`Server`的`Handler`使用默认的`DefaultServeMux`时（即Handler字段不赋值或赋nil）。使用`http.Handle()`函数便可将自定义的`Handler`“注册”到`DefaultServeMux`，这样访问不同的url就可以使用不同的`Handler`来处理。  
 > `http.Handle()`函数的定义
-```
+```go
 // 入参：
 // pattern：地址后跟的路由
 // handler：对应pattern的Handler
@@ -149,7 +149,7 @@ func Handle(pattern string, handler Handler) {
 ```
 可以看出，`http.Handle()`即是调用`DefaultServeMux`的`Handle()`方法。现通过`http.Handle()` 来向`DefaultServeMux`注册多个`Handler`。
 先定义几个`Handler`。
-```
+```go
 type indexHandler struct{}
 
 func (ih indexHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
@@ -169,7 +169,7 @@ func (bh bHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 }
 ```
 定义Server，Handler使用`DefaultServeMux`，随后将刚刚定义的两个`Handler`注册到`DefaultServeMux`并分配相应的路由地址。
-```
+```go
 package main
 
 import "net/http"
@@ -193,7 +193,7 @@ func multiHandlerServer() {
 现启动Server后，访问 http://localhost:8080 便会返回`Hello gopher`，访问 http://localhost:8080/a 便会返回`Hello gopher from aHandler`，http://localhost:8080/b 便会返回`Hello gopher from bHandler`。  
 上面的例子中，被请求的URL都完美的匹配到了与多路复用器绑定的URL，如果访问`/random`或者`/a/test`会发生什么。首先匹配不成功的URL会根据URL层级进行下降，并最终落在根URL上。所以当访问 http://localhost:8080/random 时会将交给`indexHandler`来处理。而`/a/test`这个URL根据最小惊讶原则，我们估计会觉得会交给`aHandler`。但是实际上是`indexHandler`来处理的。产生这个现象的原因是上例中绑定`Handler`时是使用的`/a`而不是`/a/`。如果绑定的URL不用`/`结尾，那么会与完全相同的URL匹配。如果以`/`结果，那么才会匹配前缀。  
 当然，也可以不用`DefaultServeMux`自己创建一个`ServeMux`类型。可以使用http包提供的`NewServeMux()`函数。
-```
+```go
 package main
 
 import (
@@ -217,7 +217,7 @@ func main() {
 ```
 ### 再回首
 如果现在回到开篇的第一个示例，可以发现这里用的并不是刚刚说的`http.Handle`方法，而是`http.HandleFunc`方法，这个方法的第一个参数和`http.Handle`方法一致，但是第二个参数是一个函数类型的参数。
-```
+```go
 package main
 
 import "net/http"
@@ -236,13 +236,13 @@ func startDefaultServer() {
 }
 ```
 `http.HandleFunc`是如何实现`http.Handle`一样的功能的呢，下面的源码一目了然。
-```
+```go
 func HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
 	DefaultServeMux.HandleFunc(pattern, handler)
 }
 ```
 `http.HandleFunc`转发`DefaultServeMux`的`HandleFunc()`方法。这个方法中其实还是调用了`Handle()`方法。调用`Handle()`方法的前提是将我们传入的函数类型`handler`转成了`HandlerFunc`类型。
-```
+```go
 func (mux *ServeMux) HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
 	// 空判断
 	if handler == nil {
@@ -254,7 +254,7 @@ func (mux *ServeMux) HandleFunc(pattern string, handler func(ResponseWriter, *Re
 }
 ```
 而`HandlerFunc`类型的底层其实还是一个函数类型，并关联了`ServeHTTP()`方法，即实现了`Handler`接口，这样一来，`Handle()`方法便可接收此类型参数了。
-```
+```go
 type HandlerFunc func(ResponseWriter, *Request)
 
 // ServeHTTP calls f(w, r).
@@ -270,7 +270,7 @@ func (f HandlerFunc) ServeHTTP(w ResponseWriter, r *Request) {
 为了方便，http包里已经封装好了几个可用的Handler，简单的试一下。
 （1）返回404
 `http.NotFoundHandler()`这个函数返回的`Handler`就是简单的响应404状态。
-```
+```go
 http.Handle("/nowhere", http.NotFoundHandler())
 ```
 （2）可超时Handler
@@ -279,7 +279,7 @@ http.Handle("/nowhere", http.NotFoundHandler())
 * http.Handler 类型，即接收请求的`Handler`
 * time.Duration 类型，预设的超时时间
 * string 类型，超时后返回的消息
-```
+```go
 http.Handle("/timeout", http.TimeoutHandler(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		time.Sleep(3 * time.Second)
 	}), 1*time.Second, "time out!!!"))
@@ -289,7 +289,7 @@ http.Handle("/timeout", http.TimeoutHandler(http.HandlerFunc(func(rw http.Respon
 `http.RedirectHandler`函数入参有两个：
 * string 类型，跳转到的Path
 * 状态码，一般用3xx
-```
+```go
 http.Handle("/redirect", http.RedirectHandler("b", http.StatusSeeOther))
 ```
 （4）实现文件服务器
@@ -301,7 +301,7 @@ http.Handle("/redirect", http.RedirectHandler("b", http.StatusSeeOther))
 >> test.txt     
 
 现想让wwwroot的路径作为文件服务器的根目录，实现方式很简单
-```
+```go
 package main
 
 import (
@@ -313,7 +313,7 @@ func main() {
 }
 ```
 如果需要实现带路由前缀的文件服务，即比如修改为访问 http://localhost:8080/files 才会路由到文件服务器的话，同样可以使用`http.Handle`函数来设定。如下
-```
+```go
 package main
 
 import (
@@ -334,7 +334,7 @@ func main() {
 * string类型，即需要过滤的路径前缀
 * Handler类型，即需使用的handler，在这里就是http.FileServer返回的handler  
 修改后的代码如下
-```
+```go
 package main
 
 import (

@@ -25,7 +25,7 @@ go: creating new go.mod: module demo.Pkg
 （1）定义自己的包   
 比如要创建一个用于简单计算的工具包，在根目录下创建目录命名为`calc`，在里面创建文件`add.go`与`multiply.go`。这两个文件的package名可以自定义，但是按照惯例最好与路径名称一致。**注意**所有处于同一个文件夹里的go文件必须使用同一个package名。
 > add.go
-```
+```go
 package calc
 
 //Add 两数相加
@@ -43,7 +43,7 @@ func AddAll(a int, numbers ...int) int {
 }
 ```
 > multiply.go
-```
+```go
 package calc
 
 //Multiply 两数相乘
@@ -62,7 +62,7 @@ func MultiplyAll(a int, numbers ...int) int {
 ```
 （2）引用定义好的包
 定义好自己的包之后，main函数就可以进行引用了。注意import的路径规则是`import %模块名%/[路径名]/包名`。如下所示：
-```
+```go
 package main
 
 import (
@@ -89,7 +89,7 @@ func main() {
 
 #### 重命名包
 我们可以对引入的包进行命名，比如
-```
+```go
 import(
 	c "demo.Pkg/calc"
 )
@@ -102,7 +102,7 @@ Go语言中有一个挺不错的规则，如果你使用import引入的包没有
 
 #### init函数
 `init`函数会在每个包完成初始化后自动执行，并且会在`main`函数之前执行。`init`函数没有入参也没有返回值。`init`函数一般用来初始化一些变量或运行某些特殊的初始化动作。
-```
+```go
 func init() {
 	fmt.Println("main : initial...")
 }
@@ -117,6 +117,6 @@ func main() {
 > main: main func
 ```
 Go编译器不允许声明导入某个包却不使用，但是如果需要某些包来执行其`init`函数的话，可以使用下划线来让Go编译器支持这样的导入并执行其`init`函数。
-```
+```go
 _ "github.com/goinaction/code/chapter2/sample/matchers"
 ```

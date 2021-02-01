@@ -8,7 +8,7 @@
 2. switch，不用写break，如果想继续向下可以使用fallthrough关键字
 
 (1) 用法1
-```
+```go
 switch val{
     case v1:
         ...
@@ -19,7 +19,7 @@ switch val{
 }
 ```
 (2) 用法2
-```
+```go
 switch {
     case val == "jack":
         ...
@@ -35,14 +35,14 @@ switch {
 ## 2.循环体
 
 1. 常见的for循环
-```
+```go
 for i := 0; i < 10; i++ {
     fmt.Println(i)
 }
 ```
 
 2. 类似while的for循环
-```
+```go
 var count = 10
 for count > 0 {
     fmt.Println(count)

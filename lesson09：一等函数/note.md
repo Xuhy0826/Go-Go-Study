@@ -7,7 +7,7 @@
 
 ## 将函数赋值给变量
 【示例1code——sensor.go】
-```
+```go
 package main
 
 import (
@@ -46,7 +46,7 @@ func main() {
 ## 将函数传递给其他函数
 因为变量既可以指向函数，又可以作为参数传递给函数，那么在Go中函数也可以作为参数传递给其他函数。有点类似C#中委托的用法。   
 【示例2code——function-parameter.go】
-```
+```go
 import (
 	"fmt"
 	"math/rand"
@@ -70,11 +70,11 @@ func main() {
 
 ## 声明函数类型
 之前我们使用过type关键字来声明类型，当时使用的底层类型是float64来声明了kelvin类型。同样函数也可以这样玩。
-```
+```go
 type sensor func() kelvin
 ```
 通过这样的声明之后，代码的可读性可以得到提升，并且之前定义的函数measureTemperature签名可以简写成
-```
+```go
 func measureTemperature(samples int, s sensor)
 ```
 
@@ -83,7 +83,7 @@ func measureTemperature(samples int, s sensor)
 * 匿名函数在Go中也称为“函数字面量”。
 * 因为函数字面量需要保留外部作用域的变量引用，所以函数字面量都是闭包的。
 
-```
+```go
 //匿名函数
 var f = func() {
 	fmt.Println("Dress up for the masquerade")
@@ -106,7 +106,7 @@ func main() {
 }
 ```
 再来看一下闭包的情形。
-```
+```go
 //声明并返回一个匿名函数
 func calibrate(s sensor, offset kelvin) sensor {
 	return func() kelvin {
