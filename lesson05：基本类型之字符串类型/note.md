@@ -17,7 +17,7 @@ upon you be peace`)
 “字符串字面量”和“原始字符串字面量”都是string类型。
 
 ## 字符、代码点、符文和字节
-* 都知道计算机中字符是通过编码存取的，也就是每个字符都使用一个特定的数字表示。比如A就是65，那么书中将这个65称为字符A的代码点。
+* 都知道计算机中字符是通过编码存取的，也就是每个字符都使用一个特定的数字表示。比如A就是65，那么书中将这个65称为字符A的**代码点**。
 * rune类型（符文类型）：Go中使用rune类型来表示字符的代码点，该类型本质上是int32类型的别名，也就是说rune和int32可以相互转换
 * byte类型：Go中的byte类型不仅可以表示二进制数据，而且被拿来表示ASCII码（ASCII共包含128个字符）。本质上byte类型是uint8类型的别名
 ```go
@@ -30,7 +30,7 @@ fmt.Printf("%v %v %v %v\n", pi, alpha, omega, bang) //960 940 969 33
 //通过使用格式化变量%c，可以将代码点表示成字符
 fmt.Printf("%c %c %c %c\n", pi, alpha, omega, bang) //π ά ω !
 ```
-在Go中使用单引号来表示字符字面量，如果用户声明一个字符变量而没有为其制定类型，那么Go会将其推断成rune类型
+在Go中使用单引号来表示字符字面量，如果用户声明一个字符变量而没有为其制定类型，那么Go会将其推断成rune类型。下面三种写法是一样的功能。
 ```go
 grade := 'A'
 var grade = 'A'
@@ -62,9 +62,9 @@ fmt.Println(utf8.RuneCountInString(question), "runes") //6 runes
 c, size := utf8.DecodeRuneInString(question)
 fmt.Printf("First rune: %c %v bytes", c, size) //First rune: 今 3 bytes
 
-//通过range关键字进行迭代，i为索引，c为值。有点python的味道
 //遍历字符串，挨个打印出来
 for i, c := range question {
     fmt.Printf("%v %c\n", i, c)
 }
 ```
+上面的示例中使用到了`range`关键字来进行遍历操作，其中`i`为索引，`c`为值。有点python的味道。

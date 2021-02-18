@@ -4,27 +4,32 @@
 
 ### 浮点类型
 go语言中有两种浮点类型：
-1. float64（占8字节内存）,默认的浮点类型，就是说不显式地指定float32，都是使用float64来定义一个带小数点的变量
+1. float64（占8字节内存）,默认的浮点类型。意思是说不显式地指定float32，都是使用float64来定义一个带小数点的变量
 2. float32（占4字节内存）
 ```go
 days := 365.2425    //短声明，days会被Go编译器推断为浮点类型默认的float64类型
+```
 如果需要使用float32，我们必须指定类型
+```go
 var pi64 = math.Pi      
 var pi32 float32 = math.Pi  //这样声明的变量才会是float32
 ```
 ### 零值
-也就是浮点类型的默认值，如果只声明变量不赋值，那么便是零值
+零值就是某个类型的默认值。在Go中，当创建一个变量但没有为其赋值时，Go会自动为其赋值对应类型的零值。浮点类型的零值很容易想到
+```go
 var price float
+```
 等同于
+```go
 price := 0.0
-
+```
 ### 格式化输出浮点值
-格式化输出需要使用到fmt.Printf()函数：
+格式化输出需要使用到`fmt.Printf()`函数：
 ```go
 fmt.Printf("%f\n", third)     //0.333333
 fmt.Printf("%.2f\n", third)   //0.33，.2f就是表示小数点后保留2位
 fmt.Printf("%4.2f\n", third)  //0.33，4.2f表示总宽（长）度为4，小数点后保留2位
-fmt.Printf("%5.2f\n", third)  // 0.33，5.2f表示总宽（长）度为5，小数点后保留2位，长度不够使用空格来补
+fmt.Printf("%5.2f\n", third)  //0.33，5.2f表示总宽（长）度为5，小数点后保留2位，长度不够使用空格来补
 fmt.Printf("%05.2f\n", third) //00.33，05.2f表示总宽（长）度为5，小数点后保留2位，长度不够使用“0”来补
 ```
 ### 浮点类型的精确性
@@ -35,7 +40,7 @@ piggyBank := 0.1
 piggyBank += 0.2
 fmt.Println(piggyBank) //0.30000000000000004
 ```
-由上面提到的浮点类型的精确度问题，就会导致浮点数的比较
+由上面提到的浮点类型的精确度问题，就会导致浮点数的比较出现意外。
 ```go
 fmt.Println(piggyBank == 0.3) //false
 ```
@@ -44,7 +49,7 @@ fmt.Println(piggyBank == 0.3) //false
 fmt.Println(math.Abs(piggyBank-0.3) < 0.0001) //true
 ```
 
-那么说到底，避免浮点数精确度问题的最佳方案就是：不使用浮点数
+那么说到底，避免浮点数精确度问题的最佳方案就是：不使用浮点数🐶
 
 ## 整数
 
@@ -104,5 +109,5 @@ distance.SetString("24000000000000000000000", 10)
 和变量不同，当我们不为常量指定类型，并直接为其赋值一个很大的数，Go会直接将其标记为无类型（untyped）而不会引发溢出异常，并且可以在程序中正常使用
 ```go
 const distance = 240000000000000000000000
-fmt.Println("Andromeda Galaxy is ", distance/299792/86400)
+fmt.Println("Andromeda Galaxy is ", distance/299792/86400)  //output: Andromeda Galaxy is  9265683466462
 ```

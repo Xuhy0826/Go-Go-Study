@@ -6,5 +6,17 @@
 	],
 	"settings": {
 		"editor.fontFamily": "'Fira Code', Consolas, 'Courier New', monospace"
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Launch file",
+				"type": "go",
+				"request": "launch",
+				"mode": "debug",
+				"program": "${file}"
+			}
+		]
 	}
 }

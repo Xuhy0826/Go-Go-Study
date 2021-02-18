@@ -4,14 +4,22 @@
 * Golang是编译型语言
 * 开发速度快，性能高效的语言
 * 更加简便，更加安全的实现并发
-* 灵活的且无继承的类型系统，不像传统的面向对象语言，Go更多的是利用**组合(Composition)**的设计模式
+* 灵活的且无继承的类型系统，不像传统的面向对象语言，Go更多的是利用 **组合(Composition)** 的设计模式
 * 拥有垃圾回收机制
 
 ## 环境搭建
-不管是Windows还是Mac，官网都提供了相应的安装包，直接下载安装即可。
+不管是Windows、Mac还是Linux，[官网](https://golang.org/dl/ "官网")都提供了相应的安装包，直接下载安装即可。而且从Go1.16版本（Released@2021-02-17）开始已原生支持Apple Silicon M1。安装完成之后在终端能正常执行`go version`说明Go已经安装成功了。  
+
+### 配置环境变量
+通过`go env`命令可以查看当前GO的所有环境变量，两个比较重要的是`GOROOT`和`GOPATH`。
+1. `GOROOT`，安装Go的路径
+2. `GOPATH`，自定义的开发者的workspace  
+
+### IDE
+我选择的是VS Code进行开发，当然还有JetBrains家的GoLand，且已经支持Apple Silicon M1了，不介意收费的可以选择GoLand。
 
 ## Hello world
-第一段程序
+第一次尝鲜
 ```go
 package main
 
@@ -28,7 +36,7 @@ func main() {
 ## 继续尝鲜
 小试一下Go中的一些语法，不系统的学习什么特定的概念，随手尝试一下Go中的一些简单命令，对Go的风格有个第一映像
 #### 几种输出控制台方法
-Golang中的几种控制台输出方法，类似其他语言的`Console.Write()`。常用的几种是`fmt.Println()`, `fmt.Print()`, `fmt.Printf()`；
+Golang中的几种控制台输出方法，类似C#的`Console.Write()`。常用的几种是`fmt.Println()`, `fmt.Print()`, `fmt.Printf()`；
 ```go
 //打印后不换行
 fmt.Print("Hello world \n") //Hello world
