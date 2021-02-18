@@ -37,9 +37,9 @@ func main() {
 	fmt.Println("area = ", width*height)   //area =  50
 	fmt.Println("time = ", distance/speed) //time =  555
 
-	fmt.Println(add(10, 2))             //12
-	fmt.Println(reverse("a", "b", "c")) //c b a
-	fmt.Println(split(14))              //6 8
+	fmt.Println(add(10, 2))              //12
+	fmt.Println(reverse1("a", "b", "c")) //c b a
+	fmt.Println(split(14))               //6 8
 }
 
 //函数的定义方式
@@ -51,6 +51,11 @@ func add(a, b int) int {
 //牛逼的地方来了，支持多个返回值
 func reverse(a, b, c string) (string, string, string) {
 	return c, b, a
+}
+
+func reverse1(a, b, c string) (x string, y string, z string) {
+	x, y, z = c, b, a
+	return
 }
 
 //又一个牛逼的写法，命名返回值，没有参数的 return 语句返回已命名的返回值。
