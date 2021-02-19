@@ -55,6 +55,17 @@ fmt.Printf("%v\n", curiosity)  //{0 137.4283}
 fmt.Printf("%+v\n", curiosity) //{lat:0 long:137.4283}
 ```
 
+## 切片也是结构体
+之前已经学习过切片的使用，包括其`append`、容量、长度等等。而切片实质上也是一个结构体。声明如下：
+```go
+type slice struct {
+    array unsafe.Pointer //指向存放数据的数组指针
+    len   int            //长度有多大
+    cap   int            //容量有多大
+}
+```
+关于指针，后面再详细学习。
+
 ## Json序列化
 在Go语言中，通过json包中的`Marshal()`方法将数据编码成json格式。注意方法返回的是bytes类型Json数据，我们可以将其转为string类型再使用。
 ```go

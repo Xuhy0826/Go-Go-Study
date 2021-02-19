@@ -1,6 +1,6 @@
 # 数组
 
-数组的数据结构和其他语言中的数组没有什么区别。数组的声明写法如下，声明一个长度为8的字符串数组。
+数组的数据结构和其他语言中的数组没有什么太大区别。数组的声明写法如下，如果声明一个长度为8的字符串数组。
 ```go
 var planets [8]string
 ```
@@ -57,7 +57,7 @@ for i := 0; i < len(dwarfs); i++ {
     fmt.Println(i, dwarf)
 }
 ```
-* 使用 **range** 关键字来遍历数组，与python很类似
+* 使用 **range** 关键字来遍历数组，之前也介绍过
 ```go
 dwarfs := [5]string{"Ceres", "Pluto", "Haumea", "Makemake", "Eris"}
 
@@ -69,7 +69,7 @@ for i, dwarf := range dwarfs {
 
 ## 数组总是被深拷贝的
 当我们声明了一个数组之后，无论是将这个数组赋值给其他变量还是作为参数传递给某个函数，都是将此数组的一个完整副本传递给变量或者函数的。
-【示例：将数组传递给变量】
+【示例】：将数组传递给变量
 ```go
 planetCollection := [...]string{
     "Mercury",
@@ -82,13 +82,14 @@ planetCollection := [...]string{
     "Neptune",
 }
 planetsMarkII := planets //会将planets的完整副本赋值给planetMarkII
-planets[2] = "whoops"
-//改变了原数组planets，数组planetsMarkII是副本，所以不受影响
+planets[2] = "whoops"    //改变了原数组planets，
+
+//数组planetsMarkII是副本，所以不受影响
 fmt.Println(planets[2])       //whoops
 fmt.Println(planetsMarkII[2]) //Earth
 ```
-【示例：将数组传递给函数】
-```
+【示例】：将数组传递给函数
+```go
 func terraform(planets [8]string){
     for i := range planets{
         planets[i] = "New " + planets[i]
@@ -112,7 +113,7 @@ func main(){
 ```
 
 ## 数组的数组（二维数组）
-这个没啥好说的，看个例子结束
+这个没啥好说的，一个例子应该能理解
 
 【示例】
 ```go
