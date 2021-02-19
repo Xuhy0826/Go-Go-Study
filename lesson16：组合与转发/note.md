@@ -34,14 +34,16 @@ func main() {
 		account:    acc,
 	}
 
-	fmt.Printf("%+v\n", jack)     //{id:1001 name:jack department:{name:Production code:DP} account:{logID:12345 level:2}}
-	fmt.Printf("jack's department is %v\n", jack.department.name) //jack's department is Production
+	fmt.Printf("%+v\n", jack)     
+	//output: {id:1001 name:jack department:{name:Production code:DP} account:{logID:12345 level:2}}
+	fmt.Printf("jack's department is %v\n", jack.department.name) 
+	//output: jack's department is Production
 }
 ```
-示例很简单，用法和其他语言很类似。
+示例很简单，用法和其他语言很类似，这里就不赘述了。
 
 ## 方法的转发
-如果为“子结构”绑定方法，“父结构”一样可以调用。
+如果为“内结构”绑定方法，“外结构”一样可以调用。
 ```go
 ...
 
@@ -72,7 +74,7 @@ func main() {
 ```
 其实像上面这样来实现方法的转发还是较为麻烦，Go语言中可以通过**struct嵌入**来实现方法的转发。
 * 实现struct嵌入的写法：在struct中只给定字段类型，不写字段名即可。不写字段名的话，就是默认使用这个类型名称作为其字段的名称了。
-改写之前的`employee`来实现struct转发，这次我们不为`employee`上绑定`salary()`方法了。
+改写之前的`employee`来实现struct转发，这次我们就不需要再为`employee`手动绑定`salary()`方法了。
 ```go
 type employee struct {
 	id   int64
@@ -156,7 +158,7 @@ func main() {
 ```
 
 ## 使用组合还是继承
-引经据典：   
+引经据典，大佬们这么说的：   
 · 优先使用对象组合而不是类的继承
 > Favor object composition over class inheritance   ——Gang of Four
 
