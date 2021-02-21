@@ -63,7 +63,7 @@ soup = append(soup, "onion", "carrot")
 fmt.Println(soup) //[onion carrot]
 ```
 ### 映射
-同理，映射在声明之后没有使用复合字面量或者make函数赋值，其值便为nil。对nil映射的读取操作不会引发panic，但是写入操作则会引发panic。
+同理，映射在声明之后没有使用复合字面量或者make函数赋值，其值便为nil。对nil映射的读取操作不会引发panic，但是**写入操作则会引发panic**。
 ```go
 var souplist map[string]int
 fmt.Println(souplist == nil) //true
@@ -96,6 +96,6 @@ fmt.Printf("%T %v %v\n", v, v, v == nil) //*int <nil> false
 ```
 在将`po`赋值给`v`之后，`v`的类型就变成了`*int`，虽然值仍然是`nil`，但是Go认定接口类型的变量只有在类型和值都为nil时才等于`nil`。所以`v == nil`的结果是`false`。
 ```go
-//格式化变量%#v可以同时打印出变量的类型和值
+//格式化变量 %#v 可以同时打印出变量的类型和值
 fmt.Printf("%#v", v)    //(*int)(nil)
 ```

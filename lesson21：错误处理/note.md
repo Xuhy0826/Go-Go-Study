@@ -1,7 +1,7 @@
 # 错误处理
 
 ## 处理错误
-在Go语言中，`error`类型是专门为错误而设的一种内置类型，有点类型C#中的`Exception`类型。由于Go允许函数有多个返回值，所以在Go语言中一种较为常见的写法来传递发生的错误的信息，就是将错误信息写在返回值（一般为最后一个返回值）。举个栗子
+在Go语言中，`error`类型是专门为错误而设的一种内置类型，有点类型C#中的`Exception`类型（但是`error`不捕获也不会使程序崩溃）。由于Go允许函数有多个返回值，所以在Go语言中一种较为常见的写法来传递发生的错误的信息，就是将错误信息写在返回值（一般为最后一个返回值）。举个栗子
 ```go
 //第二参数为错误(error)类型
 files, err := ioutil.ReadDir(".")
@@ -49,7 +49,7 @@ func proverbs(name string) error {
 2. 每次写一行文本信息都要检测异常，语法显得很臃肿   
 
 ### 关键字defer
-为了保证文件能够正确被关闭（f.Close()），可以使用defer关键字。defer是延迟的意思，defer关键字的功能就是延迟执行被它标记的操作。被defer标记的操作，Go语言会在函数返回之前触发。有点像在C#的try...cathc...finally中，我们将这些操作写在finally块中的道理一样。   
+为了保证文件能够正确被关闭（`f.Close()`），可以使用`defer`关键字。`defer`是延迟的意思，`defer`关键字的功能就是延迟执行被它标记的操作。被`defer`标记的操作，Go语言会在函数返回之前触发。有点像在C#的`try...cathc...finally`中，我们将这些操作写在finally块中的道理一样。   
 使用defer关键字之后的代码
 ```go
 func proverbsWithDefer(name string) error {
@@ -73,7 +73,7 @@ func proverbsWithDefer(name string) error {
 }
 ```
 
-### 创造性的错误处理
+### 错误处理
 我们可以声明一个新的类型`safeWriter`,在写入文件的过程中发生了错误，那么它将错误存储起来而不是直接返回它，之后当writerln尝试在此写入相同的文件时，如果发现之前已有错误，那么将不会再执行后续的操作。
 ```go
 type safeWriter struct {
@@ -101,7 +101,7 @@ func proverbsGracefully(name string) error {
 	return sw.err
 }
 ```
-这种技术背后的思想比技术本身重要的多。
+> 这种写法背后的思想比写法本身重要的多。
 
 ## 新的错误
 在出现错误时，我们可以通过创建并返回新的错误值来通知调用者出现了什么问题。在C#中我们是可以通过继承`Exception`作为基类来创建自定义的异常类型，那在Go中，`error`包包含了一个构造函数，它接受一个代表错误消息的字符串作为参数。通过这个构造函数可以创建并返回自定义的错误。   
@@ -124,7 +124,6 @@ func inBound(row, column int) bool {
 
 func (g *Grid) Set(row, column int, digit int8) error {
 	if !inBound(row, column) {
-
 		return errors.New("out of bound")
 	}
 	g[row][column] = digit
@@ -216,7 +215,7 @@ if errs != nil {
 上面`errs.(SudokuError)`断言`err`的类型为`SudokuError`。
 
 ## 不要惊恐（Panic）
-Go语言中没有提供异常机制，但是有名为panic的类似机制，前面也都有提及。如同C#中的Exception出现一样，Go遇到Panic后，程序会崩溃。在其他语言中，如果发生异常，没有人捕捉的话这个异常会一层一层的向上抛，知道抛到main函数之类的调用栈顶。处理这些异常会用到大量的try...catch...finally...throw...等等。相比之下Go语言的错误值提供了一个简单且灵活的机制来替代异常，促使开发者考虑错误，而不是像异常处理那样默认将其忽略，有助于生成更可靠的软件。  
+Go语言中没有提供异常机制，但是有名为**panic**的类似机制，前面也都有提及。如同C#中的`Exception`出现一样，Go遇到`Panic`后，程序会崩溃。在其他语言中，如果发生异常，没有人捕捉的话这个异常会一层一层的向上抛，一直抛到`main`函数之类的调用栈顶。处理这些异常会用到大量的`try...catch...finally...throw...`等等。相比之下Go语言的错误值提供了一个简单且灵活的机制来替代异常，促使开发者考虑错误，而不是像异常处理那样默认将其忽略，有助于生成更可靠的软件。  
 
 * 如果想要引发恐慌`panic`，可以这样
 ```go

@@ -5,14 +5,14 @@
 * *：解引用，提供内存地址指向的值
 ```go
 answer := 42
-fmt.Println(&answer) //0xc0000a00b0
+fmt.Println(&answer) //output: 0xc0000a00b0
 
 address := &answer
 fmt.Println(*address) //42
 
 fmt.Printf("address is a %T\n", address) //address is a *int
 ```
-上面的address变量实际上是一个`*int`类型的指针，它可以指向类型为int的其他变量。  
+上面的address变量实际上是一个`*int`类型的指针，它可以指向类型为`int的其他变量。  
 * 指针类型也是一种类型，也可以用在变量声明，函数形参，返回值类型，结构字段类型等。
 ```go
 china := "China"
@@ -22,14 +22,15 @@ fmt.Printf("home is a %T\n", home) //home is a *string
 home = &china
 fmt.Println(*home) //China
 ```
-但是如果上面的home变量不可以指向除了string类型之外的其他类型，这使得Go相对于C来说更加安全。
+但是如果上面的`home`变量不可以指向除了`string`类型之外的其他类型，这使得Go相对于C来说更加安全。
 ```go
 home = &answer //error:cannot use &answer (type *int) as type *string in assignment
 ```
 
-## 指针的作用
+## 指针的基本操作
 看示例代码，一目了然
 ```go
+//声明一个string指针
 var administrator *string
 
 //指针指向第一个人
@@ -63,14 +64,14 @@ charles := *major
 fmt.Println(charles) //Maj. General Charles Frank Bolden Jr.
 fmt.Println(bolden)  //Charles Bolden
 
-//两个string变量指向不同的地址，但是只要他们的字符串值相同，那么判等时就是ture
+//就算两个string变量指向不同的地址，但是只要他们的字符串值相同，那么判等时就是ture
 charles = "Charles Bolden"
 fmt.Println(bolden == charles)   //true
 fmt.Println(&bolden == &charles) //false
 ```
 
 ### 指向结构的指针
-对于指向结构的指针，Go的设计者为其做了优化。比如在复合字面量的前面可以放`&`，但是在访问字段时，前面可以不用加`*`，因为Go会自动实施指针解引用。
+对于指向结构的指针，Go的设计者为其做了优化。比如在复合字面量的前面可以用`&`，但是在访问字段时，前面可以不用加`*`，因为Go会自动实施指针解引用。
 ```go
 type person struct {
 	name, superpower string
