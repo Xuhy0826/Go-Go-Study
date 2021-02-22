@@ -52,8 +52,8 @@ func main() {
 	//go incCounter(1)
 	//go incCounter(2)
 
-	go doWork("A")
-	go doWork("B")
+	go doWork("A", 250)
+	go doWork("B", 1200)
 
 	time.Sleep(1 * time.Second)
 
@@ -96,11 +96,11 @@ func incCounter(id int) {
 	}
 }
 
-func doWork(name string) {
+func doWork(name string, timeConsuming time.Duration) {
 	defer wg.Done()
 	for {
 		fmt.Printf("Doing %s Work\n", name)
-		time.Sleep(250 * time.Millisecond)
+		time.Sleep(timeConsuming * time.Millisecond)
 
 		if atomic.LoadInt64(&shutdown) == 1 {
 			fmt.Printf("Shutting %s Down\n", name)

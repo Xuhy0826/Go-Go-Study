@@ -1,10 +1,10 @@
 # 并发状态
 
-在使用goroutine后不得不面对一个问题，就是当多个goroutine同时去操作同一个共享值就会发生并发问题，这种情况被称作竞争状态（race candition）。在其他语言中我们往往会通过上锁来解决这类问题，那么在Golang中该如何解决。
+在使用goroutine后不得不面对一个问题，就是当多个`goroutine`同时去操作同一个共享值就会发生并发问题，这种情况被称作竞争状态（race candition）。在其他语言中我们往往会通过上锁来解决这类问题，那么在Golang中该如何解决。
 
 ## 互斥锁
 Go中提供了互斥锁`Mutex`(mutual exclusive)，存在于包sync中。从名字大概就可以理解其意思。   
-互斥锁中有`Lock`和`Unlock`两个方法。`Lock`就是上锁，`Unlock`就是解锁。如果有goroutine尝试在互斥锁已经锁定的情况下再次调用`Lock`方法，那么它将等待直到解除锁定之后才能再次上锁。为了防止锁来锁去引发不可预知的错误，通常情况下只会在包的内部使用。
+互斥锁中有`Lock`和`Unlock`两个方法。`Lock`就是上锁，`Unlock`就是解锁。如果有`goroutine`尝试在互斥锁已经锁定的情况下再次调用`Lock`方法，那么它将等待直到解除锁定之后才能再次上锁。为了防止锁来锁去引发不可预知的错误，通常情况下只会在包的内部使用。
 ```go
 import (
 	"fmt"
@@ -15,10 +15,11 @@ var mu sync.Mutex
 
 func main() {
 	mu.Lock()
-	defer mu.Unlock()  //通常为了防止有多个return方法而忘记解锁，Unlock通常都用defer来写
+	//通常为了防止有多个return方法而忘记解锁，Unlock通常都用defer来写
+	defer mu.Unlock()  
 }
 ```
-将sync.Mutex用作结构成员的做法是一种常见的模式。下面是个示例，现在有多个goroutine来执行网络爬虫，需要有个结构来存储所有被爬的网页的次数。如果使用映射来存储，在多个goroutine尝试更新映射时，就会产生竟态条件。那么这时就需要一个互斥锁来保护。
+将`sync.Mutex`用作结构成员的做法是一种常见的模式。下面这个示例，现在有多个`goroutine`来执行网络爬虫，需要有个结构来存储所有被爬的网页的次数。如果使用映射来存储，在多个`goroutine`尝试更新映射时，就会产生竟态条件。那么这时就需要一个互斥锁来保护。
 ```go
 //Visited 用于记录网页是否被访问过
 type Visited struct {
@@ -39,8 +40,7 @@ func (v *Visited) VisitLink(url string) int {
 * 使用互斥锁时要小心陷入**死锁**。
 
 ## 原子函数
-原子函数能够以很底层的加锁机制来同步访问整型变量和指针。atmoic包中两个有用的原子函数是 LoadInt64 和 StoreInt64。这两个函数提供了一种安全地读
-和写一个整型值的方式。如下示例
+原子函数能够以很底层的加锁机制来同步访问整型变量和指针。`atmoic`包中两个有用的原子函数是 `LoadInt64` 和 `StoreInt64`。这两个函数提供了一种安全地读和写一个整型值的方式。常用的使用的方式如下示例。
 ```go
 package main
 
@@ -67,7 +67,7 @@ func main() {
 	go doWork("A")
 	go doWork("B")
 
-	// 给定 goroutine 执行的时间
+	// 给上面两个goroutine一些执行时间
 	time.Sleep(1 * time.Second)
 
 	// 该停止工作了，安全地设置 shutdown 标志
@@ -84,6 +84,7 @@ func doWork(name string) {
 		fmt.Printf("Doing %s Work\n", name)
 		time.Sleep(250 * time.Millisecond)
 
+		//检测是否收到终止信号，如果终止则退出，否则继续下一次循环
 		if atomic.LoadInt64(&shutdown) == 1 {
 			fmt.Printf("Shutting %s Down\n", name)
 			break
@@ -111,11 +112,11 @@ func worker() {
 	}
 }
 ```
-其实上面的示例完全可以不用select和time.After，直接用一个time.Sleep来实现。这里主要为了方便将这个示例拓展成等待多个通道的工作进程。
+其实上面的示例完全可以不用`select`和`time.After`，直接用一个含有`time.Sleep`的循环就可以实现。这里这样写主要为了方便将这个示例拓展成等待多个通道的工作进程。
 
 ### 综合示例
 背景描述：现在有一个在火星表面行走的探测器，通过遥控发送命令可控制探测器的行走。探测器有一个工作进程来接受命令进行移动，并且定时刷新探测器的位置。   
-首先我们将上面的工作进程进行改写。由于需要记录位置，image包中的Point结构很适合，它可以存储x轴和y轴的坐标，并且有一个Add方法可以将一个坐标点与另一个坐标点相加。
+首先我们将上面的工作进程进行改写。由于需要记录位置，image包中的`Point`结构很适合，它可以存储x轴和y轴的坐标，并且有一个Add方法可以将一个坐标点与另一个坐标点相加。
 ```go
 func worker() {
 	pos := image.Point{X: 10, Y: 10}

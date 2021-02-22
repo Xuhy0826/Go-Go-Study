@@ -3,7 +3,7 @@
 通过3个在实际工程中可以使用的包来理解不同的并发模式。
 
 ## runner
-可创建一个执行任务的对象，称为runner。runner可以接收多个任务并在后台依次执行。在执行过程中可以通过向其发送终止信号结束执行。如果执行耗时超过了初始设定的超时时间，也会结束执行。这是一种很有用的模式，接下来就是如何构建这个runner的示例。其中如何判断执行时间是否超时和是否有终止信号都是通过通道来监视的。   
+可创建一个执行任务的对象，称为`runner`。`runner`可以接收多个任务并在后台依次执行。在执行过程中可以通过向其发送终止信号结束执行。如果执行耗时超过了初始设定的超时时间，也会结束执行。这是一种很有用的模式，接下来就是如何构建这个`runner`的示例。其中如何判断执行时间是否超时和是否有终止信号都是通过通道来监视的。   
 在设计上，可支持以下终止点：
 * 程序可以在分配的时间内完成工作，正常终止；
 * 程序没有及时完成工作，“自杀”；
@@ -24,15 +24,14 @@ type Runner struct {
 	complete chan error
 }
 ```
-interrupt 通道收发 os.Signal 接口类型的值，用来从主机操作系统接收中
-断事件。其中`os.Signal`接口类型是用来从主机操作系统中接收中断事件的。
+`interrupt` 通道收发 `os.Signal` 接口类型的值，用来从主机操作系统接收中断事件。其中`os.Signal`接口类型是用来从主机操作系统中接收中断事件的。
 ```go
 type Signal interface {
     String() string
     Signal() 
 }
 ```
-`complete`是一个收发`error`接口类型值的通道。当执行过程中发生错误会将错误传入通道。main函数便可获取错误。如果正常执行完任务，便返回一个nil值。  
+`complete`是一个收发`error`接口类型值的通道。当执行过程中发生错误会将错误传入通道。`main`函数便可获取错误。如果正常执行完任务，便返回一个nil值。  
 `timeout`是用来监视超时的通道。达到初始设定的超时时间，通道中可获取到值，此时runner便会终止任务。  
 下面，针对可能发生的错误类型预先定义好两个错误变量
 ```go
@@ -43,19 +42,19 @@ var ErrTimeOut = errors.New("received timeout")
 var ErrInterrupt = errors.New("received interrupt")
 ```
 为了方便创建一个任务执行者runner，为其定义工厂函数。
-```
+```go
 //New 设定一个超时时间，返回一个新的准备使用的 Runner 类型的指针
-func New(d time.Duration) *Runner {
+func New(timeout time.Duration) *Runner {
 	return &Runner{
 		interrupt: make(chan os.Signal, 1),
 		complete:  make(chan error),
-		timeout:   time.After(d),
+		timeout:   time.After(timeout),
 	}
 }
 ```
-在New函数中初始化了`Runner`的所有通道，其中task字段的零值是nil，已经满足初始化的要求，所以没有被明确初始化。  
-但是值得注意的是 interrupt 通道被初始化为缓冲区容量为 1 的通道。这是因为这可以保证通道至少能接收一个来自语言运行时的 os.Signal 值，确保语言运行时发送这个事件的时候不会被阻塞。  
-但是 complete 通道被初始化为无缓冲的通道，是因为需要使用它来控制我们整个程序是否终止。
+在`New`函数中初始化了`Runner`的所有通道，其中`task`字段的零值是`nil`，已经满足初始化的要求，所以没有被明确初始化。  
+但是值得注意的是 `interrupt` 通道被初始化为缓冲区容量为 1 的通道。这是因为这可以保证通道至少能接收一个来自语言运行时的 `os.Signal` 值，确保语言运行时发送这个事件的时候不会被阻塞。  
+但是 `complete` 通道被初始化为无缓冲的通道，是因为需要使用它来控制我们整个程序是否终止。
 接下来为Runner类型关联几个需要的方法。  
 （1）注册任务
 ```go
@@ -95,7 +94,7 @@ func (r *Runner) gotInterrupt() bool {
 	}
 }
 ```
-值得注意的是，`gotInterrupt`方法中用到了带default分支的select语句。在没有default的select语句中，如果等待的几个通道都没有值的话就会阻塞。如果有default，通道都没有值的话，就会执行 default 分支。  
+值得注意的是，`gotInterrupt`方法中用到了带`default`分支的`select`语句。在没有`default`的`select`语句中，如果等待的几个通道都没有值的话就会阻塞。如果有`default`，通道都没有值的话，就会执行 `default` 分支。  
 （3）公开方法`Start`，开启runner执行
 ```go
 // Start 执行所有任务，并且监视通道事件
@@ -118,7 +117,11 @@ func (r *Runner) Start() error {
 	}
 }
 ```
-`Start`方法中声明了一个匿名函数，并单独启动`goroutine`来执行。在 goroutine 的内部调用了`run`方法，并将这个方法返回的`error`接口值发送到`complete`通道。创建 goroutine 后，`Start`进入一个`select`语句，阻塞等待两个事件中的任意一个。如果从`complete`通道接收到`error`接口值，那么该 goroutine 要么在规定的时间内完成了分配的工作，要么收到了操作系统的中断信号。无论哪种情况，收到的`error`接口值都会被返回，随后方法终止。如果从`timeout`通道接收到`time.Time`值，就表示 goroutine 没有在规定的时间内完成工作。这种情况下，程序会返回`ErrTimeout`变量。  
+> signal.Notify()函数
+> 声明：`func Notify(c chan<- os.Signal, sig ...os.Signal)`
+> Notify函数让signal包将输入信号转发到c。如果没有列出要传递的信号，会将所有输入信号传递到c；否则只传递列出的输入信号。
+
+`Start`方法中声明了一个匿名函数，并单独启动`goroutine`来执行。在 `goroutine` 的内部调用了`run`方法，并将这个方法返回的`error`接口值发送到`complete`通道。创建 goroutine 后，`Start`进入一个`select`语句，阻塞等待两个事件中的任意一个。如果从`complete`通道接收到`error`接口值，那么该 goroutine 要么在规定的时间内完成了分配的工作，要么收到了操作系统的中断信号。无论哪种情况，收到的`error`接口值都会被返回，随后方法终止。如果从`timeout`通道接收到`time.Time`值，就表示 goroutine 没有在规定的时间内完成工作。这种情况下，程序会返回`ErrTimeout`变量。  
 下面可以看到，在main.go中如何使用Runner来执行任务。
 ```go
 package main
@@ -128,7 +131,7 @@ import (
 	"os"
 	"time"
 
-	"demo24/runner"
+	"demo27/runner"
 )
 
 // timeout 规定了必须在多少秒内处理完成
@@ -162,7 +165,7 @@ func createTask() func(int) {
 
 ```
 ## pool
-pool包用于展示如何使用有缓冲的通道实现资源池，来管理可以在任意数量的goroutine之间共享及独立使用的资源。想想很多地方都会有资源池的实践，最常见的比如数据库的连接池，网络连接池。当一个goroutine需要从池中获取一个资源，可以向池中申请，使用完再归还到池中。  
+pool包用于展示如何使用有缓冲的通道实现资源池，来管理可以在任意数量的`goroutine`之间共享及独立使用的资源。想想很多地方都会有资源池的实践，最常见的比如数据库的连接池，网络连接池。当一个`goroutine`需要从池中获取一个资源，可以向池中申请，使用完再归还到池中。  
 首先定义资源池的结构体，其中包含四个字段。
 ```go
 // Pool 管理一组可以安全地在多个goroutine间共享的资源。且资源必须实现了io.Closer接口
@@ -264,7 +267,7 @@ func (p *Pool) Close() {
 	p.closed = true
 
 	// 在清空通道里的资源之前，将通道关闭
-	// !!!如果不这样做，会发生死锁!!!
+	// !!!如果不这样做，会发生死锁，下面的for循环会一直等待p.resources的值!!!
 	close(p.resources)
 
 	// 关闭所有资源
@@ -286,7 +289,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"demo24/pool"
+	"demo27/pool"
 )
 
 const (
@@ -353,8 +356,8 @@ func performQueries(query int, p *pool.Pool) {
 		log.Println(err)
 		return
 	}
-
-	defer conn.Close()
+	//释放资源
+	defer p.Release(conn)
 	// 用等待来模拟查询响应
 	time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
 	log.Printf("QID[%d] CID[%d]\n", query, conn.(*dbConnection).ID)
@@ -362,7 +365,7 @@ func performQueries(query int, p *pool.Pool) {
 ```
 
 ## work
-work包的场景是多个 goroutine 等待一个work工作队列中派发来的工作任务，这些goroutine拿到任务后并发执行，执行完工作的goroutine回来继续等等任务。在这种情况下，使用无缓冲的通道要比随意指定一个缓冲区大小的有缓冲的通道好，因为这个情况下既不需要一组 goroutine 配合执行，各干各的，来一个任务，任意一个goroutine领走去执行就完事了。  
+work包的场景是多个 `goroutine` 等待一个work工作队列中派发来的工作任务，这些`goroutine`拿到任务后并发执行，执行完工作的`goroutine`回来继续等任务。在这种情况下，使用无缓冲的通道要比随意指定一个缓冲区大小的有缓冲的通道好，因为这个情况下既不需要一组 `goroutine` 配合执行，各干各的，来一个任务，任意一个goroutine领走去执行就完事了。  
 lesson24的练习其实就是这种场景。
 ```go
 package work

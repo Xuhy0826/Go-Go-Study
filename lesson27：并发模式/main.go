@@ -9,9 +9,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"demo25/pool"
-	"demo25/runner"
-	"demo25/work"
+	"demo27/pool"
+	"demo27/runner"
+	"demo27/work"
 )
 
 func main() {
@@ -123,7 +123,7 @@ func performQueries(query int, p *pool.Pool) {
 		return
 	}
 
-	defer conn.Close()
+	defer p.Release(conn)
 	// 用等待来模拟查询响应
 	time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
 	log.Printf("QID[%d] CID[%d]\n", query, conn.(*dbConnection).ID)

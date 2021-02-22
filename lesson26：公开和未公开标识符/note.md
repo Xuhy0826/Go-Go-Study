@@ -58,7 +58,7 @@ func main() {
 	fmt.Printf("Counter: %d\n", counter)
 }
 ```
-将工厂函数命名为`New`是Go语言的一个习惯。但是值得注意的是这个New函数创建了一个未公开的类型并赋值给了调用者，这个程序可以编译并且运行。
+将工厂函数命名为`New`是Go语言的一个习惯。但是值得注意的是这个`New`函数创建了一个未公开的类型并赋值给了调用者，这个程序可以编译并且运行。
 解释：
 1. 公开或者未公开的标识符，不是一个值。就是说未公开的是`alertCounter`这个类型而不是`alertCounter`类型的变量值。
 2. **短变声明操作符**有能力捕获引用的类型，并创建一个未公开的类型的变量。永远不能显式创建一个未公开的类型的变量，不过**短变声明操作符**可以这么做。
@@ -89,7 +89,7 @@ func main() {
 	// 创建 entities 包中的 User 类型的值
 	u := entities.User{
 		Name:  "Bill",
-		email: "bill@email.com",
+		email: "bill@email.com",  //unknown field email in struct literal
 	}
 }
 ```

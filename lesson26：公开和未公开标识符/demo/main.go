@@ -18,10 +18,10 @@ func main() {
 	fmt.Printf("Counter: %d\n", counter)
 
 	//************** 例2 ****************
-	// 创建 entities 包中的 User 类型的值
+	//创建 entities 包中的 User 类型的值
 	// u := entities.User{
 	// 	Name:  "Bill",
-	// 	email: "bill@email.com",
+	// 	Email: "bill@email.com",
 	// }
 
 	// 创建 entities 包中的 Admin 类型的值
