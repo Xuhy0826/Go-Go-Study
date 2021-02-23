@@ -1,7 +1,7 @@
-# Golang搭建Web应用入门（1）：Handler
+# Go开发Web应用（1）：Handler
 
 ### 开门见山
-启动一个最简单的Web Server的示例。
+先不看什么原理性的内容，使用Go语言直接启动一个最简单的Web Server只需要下面几行代码。
 ```go
 package main
 
@@ -49,8 +49,8 @@ type Handler interface {
 }
 ```
 `Handler`中的`ServeHTTP`方法，入参两个：
-* `ResponseWriter`，接口类型，用来给我们写响应
-* `Request`指针，请求数据
+* `ResponseWriter`，接口类型，用来给我们编辑返回给客户端请求的响应体
+* `Request`指针，请求数据，包含请求头，请求体等所有请求信息
 > `ResponseWriter`接口定义
 ```go
 type ResponseWriter interface {

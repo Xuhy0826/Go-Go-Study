@@ -9,6 +9,7 @@ Go中与其他强类型语言（比如C#）类似，类型之间进行操作时�
 age := 41
 marsAge := float64(age)
 ```
+---
 * 浮点类型 → 整数类型：  
 
 【注意】：浮点型的小数部分是被截断，而不是四舍五入
@@ -26,6 +27,7 @@ var pi rune = 960
 var alpha rune = 940
 fmt.Println(string(pi), string(alpha)) //output: π ά
 ```
+---
 * 数字类型 → string
 
 情况特殊一点，为了将一串数组转换为string类型，必须将其中的每个数字都转换为相应的代码点（char）。也就是代表字符0的48~代表字符9的57。我们需要使用到strconv（代表“string conversion”）包提供的Itoa函数来完成这一工作。
@@ -39,6 +41,8 @@ countdown := 9
 str := fmt.Sprintf("Launch in T minus %v seconds", countdown)
 fmt.Println(str) //Launch in T minus 9 seconds
 ```
+> 注：使用 `strconv.Itoa()` 比 `fmt.Sprintf()` 要快一倍左右
+---
 * string → 数字
 一种不太常用的转换，也是使用strconv包的Atoi函数
 ```go
