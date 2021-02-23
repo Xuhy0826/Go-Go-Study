@@ -38,20 +38,26 @@ func main() {
 		// 读取MultipartForm
 		fmt.Fprintln(w, fmt.Sprintf("user name : %v", r.MultipartForm.Value["userName"]))
 		// 取出文件保存到本地
-		fh := r.MultipartForm.File["avatar"][0]
-		file, err := fh.Open()
+		if avatar, ok := r.MultipartForm.File["avatar"]; ok {
+			fh := avatar[0]
+			file, err := fh.Open()
 
-		filebuf := make([]byte, fh.Size)
-		if err == nil {
-			_, err := file.Read(filebuf)
+			filebuf := make([]byte, fh.Size)
 			if err == nil {
-				file, err := os.Create("avatar.jpg")
-				defer file.Close()
+				_, err := file.Read(filebuf)
 				if err == nil {
-					file.Write(filebuf)
+					file, err := os.Create("avatar.jpg")
+					defer file.Close()
+					if err == nil {
+						file.Write(filebuf)
+						fmt.Fprintln(w, "avatar : saved")
+					}
 				}
 			}
+		} else {
+			fmt.Fprintln(w, "avatar : no file")
 		}
+
 		//**********************************************
 	})
 
