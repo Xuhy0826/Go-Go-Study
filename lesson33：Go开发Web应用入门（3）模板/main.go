@@ -2,8 +2,11 @@ package main
 
 import (
 	"log"
+	"math/rand"
 	"net/http"
+	"strings"
 	"text/template"
+	"time"
 )
 
 func main() {
@@ -11,7 +14,10 @@ func main() {
 	//useTemplate()
 
 	//示例2：使用多个模板
-	useTemplates()
+	//useTemplates()
+
+	//示例3：使用Action
+	useAction()
 }
 
 //示例1：使用模板
@@ -40,6 +46,9 @@ func useTemplates() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		//根据请求路径取得相应的模板名
 		routePath := r.URL.Path[1:]
+		if !strings.HasSuffix(routePath, ".html") {
+			routePath = routePath + ".html"
+		}
 		tmpl := templateCollection.Lookup(routePath)
 		if tmpl != nil {
 			err := tmpl.Execute(w, nil)
@@ -61,4 +70,49 @@ func loadTmpl() *template.Template {
 	tmpls := template.New("tmpls")
 	template.Must(tmpls.ParseGlob("templateFile/*.html"))
 	return tmpls
+}
+
+//示例3：使用Action
+var templateCollection *template.Template
+
+func useAction() {
+	server := http.Server{
+		Addr: "localhost:8080",
+	}
+	//加载模板集
+	templateCollection = loadTmpl()
+
+	http.HandleFunc("/action/", action)
+
+	server.ListenAndServe()
+}
+
+//根据不同的请求路径，执行不同的模板
+func action(w http.ResponseWriter, r *http.Request) {
+	routePath := strings.ToLower(r.URL.Path[8:])
+	if !strings.HasSuffix(routePath, ".html") {
+		routePath = routePath + ".html"
+	}
+	//查询模板
+	tmpl := templateCollection.Lookup(routePath)
+	if tmpl != nil {
+		switch routePath {
+		case "ifelse.html":
+			ifAction(tmpl, w, r)
+
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+	}
+}
+
+//ifelse模板
+func ifAction(t *template.Template, w http.ResponseWriter, r *http.Request) {
+	rand.Seed(time.Now().Unix())
+	scope := 10
+	i := rand.Intn(scope)
+	//执行模板
+	t.Execute(w, i > scope/2)
 }

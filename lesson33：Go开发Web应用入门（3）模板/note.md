@@ -44,3 +44,36 @@ func main() {
 
 </html>
 ```
+
+
+### action
+#### 条件类
+```
+{{if arg}}
+...
+{{else}}
+...
+{{end}}
+```
+
+#### 迭代遍历
+可以遍历array，slice，map和channel等。结构如下
+```
+{{range array}}
+Dot is set to the element{{.}}
+{{end}}
+```
+“.”就表示每次循环的元素。
+
+#### 设置类
+
+
+#### 包含类
+```
+{{template "name"}}
+或
+{{template "name" arg}}
+```
+
+#### 定义类
+define action
