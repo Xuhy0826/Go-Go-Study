@@ -178,7 +178,7 @@ func main() {
 	http.ListenAndServe("localhost:8080", nil)
 }
 ```
-其实如果单纯的读取上传的单独文件，可以直接使用`r.FormFile()`来获取。`FormFile()`方法同事返回文件和文件头作为结果。即可以将
+其实如果单纯的读取上传的单独文件，可以直接使用`r.FormFile()`来获取。`FormFile()`方法同时返回文件和文件头作为结果。即可以将
 ```go
 fh := r.MultipartForm.File["avatar"][0]
 file, err := fh.Open()
