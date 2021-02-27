@@ -28,7 +28,7 @@ info.html模板文件如下
 </html>
 ```
 这个模板的Action只有一个"."，表示模板引擎在执行模板时，使用一个值去替换这个Action本身。有了模板文件，加载并执行也并不复杂。如下所示
-【示例1】使用模板
+##### 【示例1】使用模板
 
 ```go
 package main
@@ -65,37 +65,26 @@ t, _ := t.ParseFiles("tmpl.html")
 `ParseFiles`方法可以接收多个参数，其函数签名如下
 ```go
 func parseFiles(t *Template, readFile func(string) (string, []byte, error), filenames ...string) (*Template, error) {
-	if len(filenames) == 0 {
-		return nil, fmt.Errorf("template: no files named in call to ParseFiles")
-	}
-	for _, filename := range filenames {
-		name, b, err := readFile(filename)
-		if err != nil {
-			return nil, err
-		}
-		s := string(b)
-		var tmpl *Template
-		if t == nil {
-			t = New(name)
-		}
-		if name == t.Name() {
-			tmpl = t
-		} else {
-			tmpl = t.New(name)
-		}
-		_, err = tmpl.Parse(s)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return t, nil
+	......
 }
 ```
 无论接收几个文件名做参数，都只返回一个模板。并且这个模板的名称就是传入的第一个文件的文件名（带后缀）。但是如果传入的是多个模板文件，那么会将这些模板文件放在一个集合里保存。  
-除了`ParseFiles`函数，另外还有一个`ParseGlob`函数也可对模板进行语法分析。`ParseGlob`函数传入的参数是带通配符的文件名。比如`t.ParseGlob("templateFile/*.html)`就是将templateFile文件夹内所有后缀为html的文件一起传入进行分析
+除了`ParseFiles`函数，另外还有一个`ParseGlob`函数也可对模板进行语法分析。`ParseGlob`函数传入的参数是带通配符的文件名。比如`t.ParseGlob("templateFile/*.html)`就是将templateFile文件夹内所有后缀为.html的文件一起传入进行分析。并且可以通过Lookup方法根据模板名找出需要的模板进行执行。
+```go
+templateCollection := template.ParseGlob("templateFile/*.html")
+tmpl := templateCollection.Lookup("a.html")
+tmpl.Execute(w, nil)
+```
+另外，`template.Must`函数提供了一种处理错误的机制。`template.Must`可以包裹一个待执行的函数，待执行的函数返回的是一个指向模板的指针和一个可为空的错误。如果这个错误不是nil，那么`template.Must`函数将会引发`panic`。如果没有错误，返回模板指针。
+```go
+t := template.Must(template.ParseGlob("templateFile/*.html))
+```
 
 ### action
-#### 条件类
+在模板文件中使用双大括号包裹的内容就称为Action，单纯的点“.”就是一个简单的Action。当然除了“.”还有其他的Action。
+
+#### 条件Action
+条件Action根据参数值来进行分支操作。
 ```
 {{if arg}}
 ...
@@ -103,20 +92,133 @@ func parseFiles(t *Template, readFile func(string) (string, []byte, error), file
 ...
 {{end}}
 ```
+当然，可以没有“else”分支。一个简单的示例即可说明用法。
+##### 【示例2】条件Action的使用
+```go
+func main() {
+	server := http.Server{
+		Addr: "localhost:8080",
+	}
 
-#### 迭代遍历
-可以遍历array，slice，map和channel等。结构如下
+	http.HandleFunc("/action", action)
+
+	_ = server.ListenAndServe()
+}
+
+func action(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("templateFile/ifelse.html")
+	//产生随机数
+	rand.Seed(time.Now().Unix())
+	scope := 10
+	i := rand.Intn(scope)
+	//执行模板
+	t.Execute(w, i > scope/2)
+}
+```
+模板文件如下，只包含一层条件Action。由于传入的参数是由随机数控制，所以不停访问会随机返回两种相应。
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IF-ELSE</title>
+</head>
+
+<body>
+    {{if .}}
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere sit aut quos, natus iure alias dolore quam! Eum hic,
+    fuga quasi eos impedit distinctio nam iusto commodi nemo odit libero.
+    {{else}}
+    襟三江而带五湖，控蛮荆而引瓯越。物华天宝，龙光射牛斗之墟；人杰地灵，徐孺下陈蕃之榻。雄州雾列，俊采星驰。台隍枕夷夏之交，宾主尽东南之美。
+    {{end}}
+</body>
+
+</html>
+```
+
+#### 迭代Action
+可以遍历array，slice，map和channel等。结构如下，其中迭代内部的点（.）会被赋予被迭代的元素。
 ```
 {{range array}}
 Dot is set to the element{{.}}
+{{else}}
+Nothing to show
 {{end}}
 ```
-“.”就表示每次循环的元素。
+如果加上`{{else}}`段，那么传入的集合为`nil`时，则会进入`{{else}}`段。
+##### 【示例3】迭代Action的使用
+```html
+<!DOCTYPE html>
+<html lang="en">
 
-#### 设置类
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Range</title>
+</head>
 
+<body>
+    <ul>
+    {{range .}}
+    <li>{{.}}</li>
+    {{else}}
+    <li>nothing</li>
+    {{end}}
+</ul>
+</body>
 
-#### 包含类
+</html>
+```
+Handler中向模板中传入一个string数组进行迭代
+```go
+func rangeAction(t *template.Template, w http.ResponseWriter, r *http.Request) {
+	daysOfWeek := []string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sta", "Sun"}
+	t.Execute(w, daysOfWeek)
+}
+```
+
+#### 设置Action
+设置Action允许用户在指定范围内为点（.）设置值。就是在{{with %你想设置的值%}}与{{end}}之间，点（.）不再是传入的值，而是你设置的值。
+```
+{{with arg}}
+ Dot is set to arg
+{{end}}
+```
+用个例子说明。
+##### 【示例4】设置Action的用法
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>With </title>
+</head>
+
+<body>
+<div>点表示： {{.}}</div>
+<div>
+    {{with "gopher"}}
+    点表示： {{.}}
+    {{end}}
+</div>
+</body>
+
+</html>
+```
+```go
+//设置Action
+func withAction(t *template.Template, w http.ResponseWriter, r *http.Request) {
+	t.Execute(w, "hello")
+}
+```
+#### 包含Action
 ```
 {{template "name"}}
 或

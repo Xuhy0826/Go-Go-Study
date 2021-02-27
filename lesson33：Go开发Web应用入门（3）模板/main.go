@@ -99,7 +99,10 @@ func action(w http.ResponseWriter, r *http.Request) {
 		switch routePath {
 		case "ifelse.html":
 			ifAction(tmpl, w, r)
-
+		case "range.html":
+			rangeAction(tmpl, w, r)
+		case "with.html":
+			withAction(tmpl, w, r)
 		default:
 			w.WriteHeader(http.StatusNotFound)
 		}
@@ -108,11 +111,22 @@ func action(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//ifelse模板
+//条件Action
 func ifAction(t *template.Template, w http.ResponseWriter, r *http.Request) {
 	rand.Seed(time.Now().Unix())
 	scope := 10
 	i := rand.Intn(scope)
 	//执行模板
 	t.Execute(w, i > scope/2)
+}
+
+//迭代Aciton
+func rangeAction(t *template.Template, w http.ResponseWriter, r *http.Request) {
+	daysOfWeek := []string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sta", "Sun"}
+	t.Execute(w, daysOfWeek)
+}
+
+//设置Action
+func withAction(t *template.Template, w http.ResponseWriter, r *http.Request) {
+	t.Execute(w, "hello")
 }
