@@ -28,10 +28,10 @@ func useTemplate() {
 
 	http.HandleFunc("/info", func(w http.ResponseWriter, r *http.Request) {
 		t, _ := template.ParseFiles("templateFile/info.html")
-		t.Execute(w, "hello gopher")
+		_ = t.Execute(w, "hello gopher")
 	})
 
-	server.ListenAndServe()
+	_ = server.ListenAndServe()
 }
 
 //示例2：使用多个模板
@@ -63,7 +63,7 @@ func useTemplates() {
 	http.Handle("/css/", http.FileServer(http.Dir("wwwroot")))
 	http.Handle("/imgs/", http.FileServer(http.Dir("wwwroot")))
 
-	server.ListenAndServe()
+	_ = server.ListenAndServe()
 }
 
 func loadTmpl() *template.Template {
@@ -84,7 +84,7 @@ func useAction() {
 
 	http.HandleFunc("/action/", action)
 
-	server.ListenAndServe()
+	_ = server.ListenAndServe()
 }
 
 //根据不同的请求路径，执行不同的模板
