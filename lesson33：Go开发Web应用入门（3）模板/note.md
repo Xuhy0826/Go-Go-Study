@@ -93,6 +93,7 @@ t := template.Must(template.ParseGlob("templateFile/*.html))
 {{end}}
 ```
 当然，可以没有“else”分支。一个简单的示例即可说明用法。
+
 ##### 【示例2】条件Action的使用
 ```go
 func main() {
@@ -141,6 +142,7 @@ func action(w http.ResponseWriter, r *http.Request) {
 
 #### 迭代Action
 可以遍历array，slice，map和channel等。结构如下，其中迭代内部的点（.）会被赋予被迭代的元素。
+
 ```
 {{range array}}
 Dot is set to the element{{.}}
@@ -148,6 +150,7 @@ Dot is set to the element{{.}}
 Nothing to show
 {{end}}
 ```
+
 如果加上`{{else}}`段，那么传入的集合为`nil`时，则会进入`{{else}}`段。
 ##### 【示例3】迭代Action的使用
 ```html
@@ -219,11 +222,184 @@ func withAction(t *template.Template, w http.ResponseWriter, r *http.Request) {
 }
 ```
 #### 包含Action
+包含Action可以让模板实现嵌套。写法是下面这样
 ```
 {{template "name"}}
 或
 {{template "name" arg}}
 ```
+其中`name`就是要包含的模板的名称。下面这个模板"t1.html"中嵌套了"t2.html"。前面说过模板文件的名称会被用作为模板的名。
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>t1</title>
+</head>
+	<body>
+		<div>This is t1.html before</div>
+		<div>This is the value of the dot in t1.html - {{.}}</div>
+		<hr/>
+		{{template "t2.html"}}
+		<hr/>
+		<div>This is t1.html after</div>
+	</body>
+</html>
+```
 
-#### 定义类
-define action
+而"t2.html"模板如下
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>t2</title>
+</head>
+<body>
+	<div style="background-color: dodgerblue">
+		This is t2.html
+		This is the value of the dot in t2.html - {{.}}
+	</div>
+</body>
+</html>
+```
+访问 `http://localhost:8080/action/t1` 能看到下面的界面。  
+![包含Action](https://github.com/Xuhy0826/Golang-Study/blob/master/resource/t1html.jpg)
+
+需要注意的是，加载嵌套的模板需要对所有涉及到的模板进行分析，就是在调用`ParseFiles`函数或者`ParseGlob`函数时要将涉及到的模板都传入。上面模板t1.html中的点(.)被传入的字符串所替换，但是t2.html中的点(.)却没有。如果将t1.html中的Action改写成`{{template "name" arg}}`这样便可以将变量传递到嵌套的模板中，如下
+```html
+{{template "t2.html" .}}
+```
+现在访问 `http://localhost:8080/action/t1` 的界面如下。
+![包含Action](https://github.com/Xuhy0826/Golang-Study/blob/master/resource/t1v2html.jpg)
+
+### 参数、变量和管道
+#### 参数和变量
+前面一直在模板中使用的点(.)就是一个参数，表示的是Handler向模板传递的数据。除了点(.)，参数还可以是bool、int、string等字面量，也可以是结构或者方法，但是方法只能有一个返回值或者一个返回值加一个可为空的错误。  
+用户还可以在模板中定义变量，使用`$`符号开头，如下
+```html
+{{range $key, $value := .}}
+The key is {{$key}} and the value is {{$value}}
+{{end}}
+```
+这样，从Handler传给模板一个map时，便可以进行遍历了。
+
+#### 管道
+模板中的管道是多个有序的串联起来的参数、函数或者方法。工作方式和Linux中的管道有点类似。
+```
+{{p1 | p2 | p3}
+```
+在管道中，p1的输出作为p2的输入，依次下去。举个简单的例子
+```
+{{12.3456 | printf "%.2f"}}
+```
+上面的管道，浮点数字面量作为参数输入到模板的内置函数`printf`中，并使用指定的格式符，最终输出12.35.
+
+### 函数
+Go的函数可以作为参数输入模板，并且Go模板引擎也内置了一些函数，这些函数都有限制：只能有一个返回值或者一个返回值加一个可为空的错误。  
+用户创建自定义的模板函数的步骤：  
+（1）创建一个`FuncMap`的映射，并将映射的键设置为函数的名字，值设置成实际函数
+（2）将`FuncMap`与模板进行绑定
+【示例5】自定义模板函数
+```go
+func main() {
+	server := http.Server{
+		Addr: "localhost:8080",
+	}
+	http.HandleFunc("/process", process)
+	_ = server.ListenAndServe()
+}
+
+//模板函数的使用
+func process(tw http.ResponseWriter, r *http.Request) {
+	//step1: 创建FuncMap映射
+	funcMap := template.FuncMap{
+		"fdate": formatDate,
+	}
+	//step2: 将FuncMap映射与模板关联
+	t := template.New("tmpl.html").Funcs(funcMap)
+
+	t, _ = t.ParseFiles("tmpl.html")
+	t.Execute(w, time.Now())
+}
+
+//自定义模板函数：格式化日期
+func formatDate(t time.Time) string {
+	layout := "2006-01-02"
+	return t.Format(layout)
+}
+```
+模板文件如下
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Process</title>
+</head>
+<body>
+	<div>The date time is {{ . | fdate }}</div>
+	<!--或者-->
+	<div>The date time is {{ fdate . }}</div>
+</body>
+</html>
+```
+但是，综合来说，管道还是会比函数要更强大和灵活，并更加易读。
+
+### 布局Layout
+布局页（layout）在很多其他的Web框架中也经常见到，比如ASP.NET(Core)中也有layout的使用。使用`{{template "name" .}}`可以在模板中实现嵌套，如果使用这样的方法来实现布局页，那么每个页面都需要有一个自己的布局页文件，那么意义就不是很大了。我们需要的是一个公共的布局页。这里，Go还提供了定义Action来帮助实现布局页。  
+【示例6】使用布局页
+```html
+{{define "layout"}}
+
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Go Layout</title>
+</head>
+<body>
+    <div>This is Layout - begin</div>
+    <div>this is value - {{.}}</div>
+    {{template "content"}}
+    <div>This is Layout - end</div>
+</body>
+</html>
+
+{{end}}
+```
+```html
+{{define "content"}}
+
+<h1 style="color: red">Hello world</h1>
+
+{{end}}
+```
+```html
+{{define "content"}}
+
+<h1 style="color: blue">Hello world</h1>
+
+{{end}}
+```
+下面是后台代码
+```go
+func main() {
+	server := http.Server{
+		Addr: "localhost:8080",
+	}
+	http.HandleFunc("/layout", layout)
+	_ = server.ListenAndServe()
+}
+
+func layout(w http.ResponseWriter, r *http.Request) {
+	rand.Seed(time.Now().Unix())
+	var t *template.Template
+	if rand.Intn(10) > 5 {
+		t, _ = t.ParseFiles("layout.html", "redHello.html")
+	} else {
+		t, _ = t.ParseFiles("layout.html", "blueHello.html")
+	}
+	_ = t.ExecuteTemplate(w, "layout", "")
+}
+```
+和之前不一样的是，这里使用的执行模板的方法是`ExecuteTemplate`，并把待执行的模板名传入。这样的写法便实现了布局页。

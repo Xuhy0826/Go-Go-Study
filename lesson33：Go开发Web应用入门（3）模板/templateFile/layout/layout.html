@@ -1,0 +1,16 @@
+{{define "layout"}}
+
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Go Layout</title>
+</head>
+<body>
+	<div>This is Layout - begin</div>
+	<div>this is value - {{.}}</div>
+	{{template "content"}}
+	<div>This is Layout - end</div>
+</body>
+</html>
+
+{{end}}

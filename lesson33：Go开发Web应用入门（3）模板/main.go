@@ -17,7 +17,13 @@ func main() {
 	//useTemplates()
 
 	//示例3：使用Action
-	useAction()
+	//useAction()
+
+	//示例5：自定义模板函数
+	//useFunc()
+
+	//示例6：使用布局页
+	//useLayout()
 }
 
 //示例1：使用模板
@@ -103,6 +109,8 @@ func action(w http.ResponseWriter, r *http.Request) {
 			rangeAction(tmpl, w, r)
 		case "with.html":
 			withAction(tmpl, w, r)
+		case "t1.html":
+			NestingAction(tmpl, w, r)
 		default:
 			w.WriteHeader(http.StatusNotFound)
 		}
@@ -117,7 +125,7 @@ func ifAction(t *template.Template, w http.ResponseWriter, r *http.Request) {
 	scope := 10
 	i := rand.Intn(scope)
 	//执行模板
-	t.Execute(w, i > scope/2)
+	_ = t.Execute(w, i > scope/2)
 }
 
 //迭代Aciton
@@ -126,7 +134,60 @@ func rangeAction(t *template.Template, w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, daysOfWeek)
 }
 
-//设置Action
+//【示例4】设置Action
 func withAction(t *template.Template, w http.ResponseWriter, r *http.Request) {
-	t.Execute(w, "hello")
+	_ = t.Execute(w, "hello")
+}
+
+//包含Action
+func NestingAction(t *template.Template, w http.ResponseWriter, r *http.Request) {
+	_ = t.Execute(w, "Hello gopher")
+}
+
+//示例5：模板函数的使用
+func useFunc() {
+	server := http.Server{
+		Addr: "localhost:8080",
+	}
+	http.HandleFunc("/process", process)
+	_ = server.ListenAndServe()
+}
+
+//模板函数的使用
+func process(w http.ResponseWriter, r *http.Request) {
+	//step1: 创建FuncMap映射
+	funcMap := template.FuncMap{
+		"fdate": formatDate,
+	}
+	//step2: 将FuncMap映射与模板关联
+	t := template.New("tmpl.html").Funcs(funcMap)
+
+	t, _ = t.ParseFiles("tmpl.html")
+	t.Execute(w, time.Now())
+}
+
+//自定义模板函数
+func formatDate(t time.Time) string {
+	layout := "2006-01-02"
+	return t.Format(layout)
+}
+
+//示例6：layout的使用
+func useLayout() {
+	server := http.Server{
+		Addr: "localhost:8080",
+	}
+	http.HandleFunc("/layout", layout)
+	_ = server.ListenAndServe()
+}
+
+func layout(w http.ResponseWriter, r *http.Request) {
+	rand.Seed(time.Now().Unix())
+	var t *template.Template
+	if rand.Intn(10) > 5 {
+		t, _ = t.ParseFiles("layout.html", "redHello.html")
+	} else {
+		t, _ = t.ParseFiles("layout.html", "blueHello.html")
+	}
+	_ = t.ExecuteTemplate(w, "layout", "")
 }
