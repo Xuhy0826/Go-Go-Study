@@ -1,4 +1,4 @@
-# Go开发Web应用（4）：服务
+# Go开发Web应用（4）：Web服务
 
 ## 处理Json数据
 
@@ -40,5 +40,104 @@ type Author struct {
 
 ```
 
-下面在Handler中读取请求中传来的json数据
+由于`json.NewDecoder()`函数接收的参数是`io.Reader`接口类型，而`request.Body`恰好满足`io.Reader`接口。下面示例展示了在Handler中读取请求中传来的json数据。
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"lesson34/model"
+	"net/http"
+)
+
+func main() {
+	server := http.Server{
+		Addr: "localhost:8080",
+	}
+
+	http.HandleFunc("/json", processJson)
+
+	_ = server.ListenAndServe()
+}
+
+func processJson(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	var post = model.Post{}
+	//创建解码器
+	decoder := json.NewDecoder(r.Body)
+	//进行解码，将数据解码到结构上
+	err := decoder.Decode(&post)
+	if err != nil {
+		fmt.Println(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusCreated)
+	fmt.Printf("%+v", post)
+}
+
+```
+
+### 创建json
+
+相对应的，使用`encoding/json`来创建json数据返回也是类似的流程，需要通过`json.NewEncoder()`函数来得到编码器，入参需要`io.Writer`接口，而恰好`http.ResponseWriter`满足接口。再将需要序列化的结构作为参数传入编码器的进行编码从而得到json数据。
+
+以下示例展示了这个过程。
+
+```go
+func processJson(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+        // 创建json数据返回
+		serializeJson(w, r)
+	} else if r.Method == http.MethodPost {
+		deserializeJson(w, r)
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+	}
+}
+
+func serializeJson(w http.ResponseWriter, r *http.Request) {
+	post := getModel()
+	//创建编码器
+	encoder := json.NewEncoder(w)
+	//进行编码，成json数据格式
+	err := encoder.Encode(&post)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+//getModel 返回一个model.Post变量
+func getModel() model.Post {
+	return model.Post{
+		Id:      1,
+		Content: "go go go",
+		Author: model.Author{
+			Id:   2,
+			Name: "xuhy",
+		},
+		Comments: []model.Comment{
+			{
+				Id:      7,
+				Content: "lucky day",
+				Author:  "jason",
+			},
+			{
+				Id:      8,
+				Content: "what a wonderful life",
+				Author:  "jarvis",
+			},
+		},
+	}
+}
+```
+
+## 路由
+
+搭建REST API Service需要为不同的请求路径和请求方式设置不同的处理流程，也就是指定相应的Handler。比如之前开发ASP.NET Core WebApi 使用MVC的模式，框架基本已经帮我们封装路由功能，只需简单配置与标注特性就可以自定义路由规则。在Go中使用`DefaultServerMux`也可以实现最基本的路由功能，当然开源的轮子也有不少，比如[Gorilla/Mux](https://github.com/gorilla/mux,"Gorilla/Mux")或者 [httprouter](https://github.com/julienschmidt/httprouter)。
 
