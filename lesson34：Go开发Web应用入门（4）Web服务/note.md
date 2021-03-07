@@ -139,5 +139,85 @@ func getModel() model.Post {
 
 ## 路由
 
-搭建REST API Service需要为不同的请求路径和请求方式设置不同的处理流程，也就是指定相应的Handler。比如之前开发ASP.NET Core WebApi 使用MVC的模式，框架基本已经帮我们封装路由功能，只需简单配置与标注特性就可以自定义路由规则。在Go中使用`DefaultServerMux`也可以实现最基本的路由功能，当然开源的轮子也有不少，比如[Gorilla/Mux](https://github.com/gorilla/mux,"Gorilla/Mux")或者 [httprouter](https://github.com/julienschmidt/httprouter)。
+搭建REST API Service需要为不同的请求路径和请求方式设置不同的处理流程，也就是指定相应的Handler。比如之前开发ASP.NET Core WebApi 使用MVC的模式，框架基本已经帮我们封装路由功能，只需简单配置与标注特性就可以自定义路由规则。在Go中使用`DefaultServerMux`也可以实现最基本的路由功能，当然有很多开源的轮子用起来能更加方便，比如[Gorilla/Mux](https://github.com/gorilla/mux,"Gorilla/Mux")或者 [httprouter](https://github.com/julienschmidt/httprouter)。
+
+接下来简单介绍下基于gorilla/mux来配置路由的方法，首先gorilla/mux的最基本用法如下
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/gorilla/mux"
+	"lesson34/model"
+	"net/http"
+)
+
+func main() {
+	r := mux.NewRouter()
+
+	r.HandleFunc("/", index)
+	r.HandleFunc("/post", getPostHandler)
+
+	http.ListenAndServe("localhost:8080", r)
+}
+
+func index(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("welcome!"))
+}
+
+func getPostHandler(w http.ResponseWriter, r *http.Request) {
+	serializeJson(w, r)
+}
+```
+
+初看起来和之前使用标准库中的写法差不多，只是把`DefaultServerMux`替换成了`mux.Router`。接下来看下如何进行更多细节的配置。
+
+````go
+r.HandleFunc("/post", getPostHandler).
+	Methods(http.MethodGet). //限制访问方法：POST
+	Schemes("http").         //设置scheme为http
+	Name("getpost")          //命名路由
+
+r.Path("/post").
+	Methods(http.MethodPost).                   //限制访问方法：POST
+	HandlerFunc(postPostHandler).               //设置处理方法
+	Schemes("http").                            //设置scheme为http
+	Headers("Content-Type", "application/json") //设置请求头
+````
+
+除此之外，我们还可以进行路由参数的配置，而且支持正则的匹配
+
+```go
+r.HandleFunc("/news/{title:[a-z]+}", newList). //路由参数：支持正则
+	Methods(http.MethodGet)
+```
+
+在`Handler`中获取路由参数的方法如下
+
+```go
+func newList(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r) //获取参数，map类型
+	var newsList []model.News
+
+	allnews := getAllNews() //获取所有 news 集合
+	for _, news := range allnews {
+		if strings.Contains(news.Title, vars["title"]) {
+			newsList = append(newsList, news)
+		}
+	}
+	//json 序列化后返回
+	encoder := json.NewEncoder(w)
+	err := encoder.Encode(&newsList)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	w.WriteHeader(http.StatusOK)
+}
+```
+
+以上简单介绍了`gorilla/mux`中路由的使用，更多的详细说明还是参阅官方文档靠谱。
+
+以上的代码中，所有对路由的配置工作都堆在了main函数中，既不优雅也不利于以后的维护。而比较实用的做法是将各个功能组的路由分到不同的go文件中，在使用同一的配置入口进行注册。就以上面所用到的代码为例，
 
