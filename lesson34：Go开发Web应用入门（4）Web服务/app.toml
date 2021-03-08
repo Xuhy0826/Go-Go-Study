@@ -1,0 +1,21 @@
+SeHost = "127.0.0.1"
+SePort = "8080"
+
+isDebug = true
+
+[PostgreSqlConf]
+DBType = "PostgreSql"
+UserName = "xuhy"
+Password = "123456"
+DBHost = "127.0.0.1"
+DBPort = "5434"
+DBName = "test"
+
+[MySqlConf]
+DBType = "MySql"
+UserName = "xuhy"
+Password = "123456"
+DBHost = "127.0.0.1"
+DBPort = "8902"
+DBName = "test"
+
