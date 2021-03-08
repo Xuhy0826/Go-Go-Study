@@ -1,16 +1,16 @@
 # Go开发Web应用（4）：Web服务
 
-前言：通过前面的学习，了解了使用的Go来进行Web编程的一些基本知识。如何开发一个有一定规范性的的Web服务仍有很多地方需要改进，比如开发一个REST API，如何处理不同的http方法，数据传输，权限验证和配置等等如何处理呢。
+前言：通过前面的学习，了解了使用的Go来进行Web编程的一些基本知识。如何开发一个有一定规范性的Web服务仍有很多地方需要改进，比如开发一个REST API，如何处理不同的http方法，数据传输，权限验证和配置等等如何处理呢。
 
 > 本文示例代码已上传至GitHub：[传送门](https://github.com/Xuhy0826/Go-Go-Study/tree/master/lesson34%EF%BC%9AGo%E5%BC%80%E5%8F%91Web%E5%BA%94%E7%94%A8%E5%85%A5%E9%97%A8%EF%BC%884%EF%BC%89Web%E6%9C%8D%E5%8A%A1)
 
 ## 处理Json数据
 
-在与REST Web服务进行交互时，使用最频繁的数据格式应该就是JSON了。前面我们也了解了 [Go如何（反）序列化对象](https://my.oschina.net/xuhy0826/blog/4956986)，通过使用内置的json包便可以实现。除此之外，还可以使用encoding包来实现对json数据的处理，而且encoding包更方便在Web编程中使用，因为它是根据编码器或者解码器来处理**流式数据**。
+在与REST Web服务进行交互时，当前使用最广泛的数据格式应该就是JSON了。前面的学习我们也了解了[Go如何（反）序列化对象]("https://my.oschina.net/xuhy0826/blog/4956986") ，之前是通过使用内置的`json`包来实现。除此之外，还可以使用`encoding`包来实现对json数据的处理，而且`encoding`包也更方便在Web编程中使用，因为它是根据编码器或者解码器来处理**流式数据**。
 
 ### 读取Json数据
 
-使用encoding包来读取json数据的大致流程可以分为3步
+使用`encoding`包来读取json数据的大致流程可以分为3步
 
 1. 创建用户存储json数据的结构
 2. 创建出用于解码的json数据的解码器
@@ -44,7 +44,7 @@ type Author struct {
 
 ```
 
-由于`json.NewDecoder()`函数接收的参数是`io.Reader`接口类型，而`request.Body`恰好满足`io.Reader`接口。下面示例展示了在Handler中读取请求中传来的json数据。
+由于`json.NewDecoder()`函数接收的参数是`io.Reader`接口类型，而`request.Body`恰好满足`io.Reader`接口。下面示例展示了在`Handler`中读取请求中传来的json数据。
 
 ```go
 package main
@@ -88,7 +88,7 @@ func processJson(w http.ResponseWriter, r *http.Request) {
 
 ### 创建json
 
-相对应的，使用`encoding/json`来创建json数据返回也是类似的流程，需要通过`json.NewEncoder()`函数来得到编码器，入参需要`io.Writer`接口，而恰好`http.ResponseWriter`满足接口。再将需要序列化的结构作为参数传入编码器的进行编码从而得到json数据。
+相对应的，使用`encoding/json`来创建json数据也是类似的流程，需要通过`json.NewEncoder()`函数来得到编码器，入参需要`io.Writer`接口，而恰好`http.ResponseWriter`满足接口。再将需要序列化的结构作为参数传入编码器的进行编码从而得到json数据。
 
 以下示例展示了这个过程。
 
@@ -143,9 +143,9 @@ func getModel() model.Post {
 
 ## 路由
 
-搭建REST API Service需要为不同的请求路径和请求方式设置不同的处理流程，也就是指定相应的Handler。比如之前开发ASP.NET Core WebApi 使用MVC的模式，框架基本已经帮我们封装路由功能，只需简单配置与标注特性就可以自定义路由规则。在Go中使用`DefaultServerMux`也可以实现最基本的路由功能，当然有很多开源的轮子用起来能更加方便，比如[Gorilla/Mux](https://github.com/gorilla/mux,"Gorilla/Mux")或者 [httprouter](https://github.com/julienschmidt/httprouter)。
+搭建 REST API Service 需要为不同的请求路径和请求方式设置不同的处理流程，也就是指定相应的Handler。比如之前开发ASP.NET Core WebApi 使用MVC的模式，框架基本已经帮我们封装了较为完善路由功能，只需简单配置与特性标注便可以自定义路由规则。在Go中使用`DefaultServerMux`也可以实现最基本的路由功能，但是功能不是很完善，比如无法根据GET、POST或是PUT等方法进行具体配置。借助很多开源的轮子能让路由配置更加简便，比如 [Gorilla/Mux]("https://github.com/gorilla/mux") 或者 [httprouter]("https://github.com/julienschmidt/httprouter") 。
 
-接下来简单介绍下基于gorilla/mux来配置路由的方法，安装直接使用`go get`命令即可，切到自己的工作目录下执行
+接下来简单介绍下基于`gorilla/mux`来配置路由的方法，安装直接使用`go get`命令即可，切到自己的工作目录下执行
 
 ```bash
 go get -u github.com/gorilla/mux
@@ -257,7 +257,9 @@ func getAllNews() []model.News {
 
 ```
 
-这样一来，所有的`Handler`结构就清晰了很多。接下来为创建一个配置的统一入口，为了方便配置，创建一个`Route`类型来设置配置信息。
+这样一来，所有的`Handler`结构就清晰了很多。接下来创建一个配置的统一入口，方便进行配置。
+
+创建一个`Route`类型来设置配置信息。
 
 - /router/router.go
 
@@ -473,5 +475,103 @@ func main() {
 }
 ```
 
+## 配置
 
+实际项目中，很多信息都需要保存于配置文件中。在Go中使用配置文件和其他语言类似，下面以一个toml格式的配置文件为例。
 
+```toml
+SeHost = "127.0.0.1"
+SePort = "8080"
+isDebug = true
+
+[PostgreSqlConf]
+DBType = "PostgreSql"
+UserName = "xuhy"
+Password = "123456"
+DBHost = "127.0.0.1"
+DBPort = "5434"
+DBName = "test"
+
+[MySqlConf]
+DBType = "MySql"
+UserName = "xuhy"
+Password = "123456"
+DBHost = "127.0.0.1"
+DBPort = "8902"
+DBName = "test"
+```
+
+为读取toml文件我们需要使用`github.com/BurntSushi/toml`组件，为管理配置文件我们再创建一个go文件。
+
+```go
+package conf
+
+import (
+	"fmt"
+	"github.com/BurntSushi/toml"
+	"time"
+)
+
+type tomlConf struct {
+	IsDebug bool   `toml:"isDebug"`
+	SeHost  string `toml:"SeHost"`
+	SePort  string `toml:"SePort"`
+
+	PostgreSql DBConf `toml:"PostgreSqlConf"`
+	MySql      DBConf `toml:"MySqlConf"`
+}
+
+type DBConf struct {
+	DBType   string
+	UserName string
+	Password string
+	DBHost   string
+	DBPort   string
+	DBName   string
+}
+
+//App App的相关配置项
+var App *tomlConf
+
+func init() {
+	App = new(tomlConf)
+}
+
+//Init 初始化配置文件
+func Init(filePath string) {
+	_, err := toml.DecodeFile(filePath, App)
+	if err != nil {
+		fmt.Println("Fail to load Configuration file, try again in 10 seconds，error:", err)
+		time.Sleep(time.Second * 10)
+		Init(filePath)
+	}
+}
+```
+
+这样一来，在main函数中增加对于配置的加载和使用。
+
+```go
+package main
+
+import (
+	"fmt"
+	"lesson34/conf"
+	"lesson34/middleware"
+	"lesson34/router"
+	"net/http"
+)
+
+func main() {
+	//加载配置
+	conf.Init("app.toml")
+
+	r := router.New(router.Routes...)
+	//调用顺序： logging -> auth -> next
+	r.Use(middleware.LoggingMiddleware, middleware.AuthMiddleware)
+
+	addr := fmt.Sprintf("%s:%s", conf.App.SeHost, conf.App.SePort)
+	_ = http.ListenAndServe(addr, r)
+}
+```
+
+关于配置管理，也有不少强大的开源组件，比如[viper]("https://github.com/spf13/viper")就是一个可以同时支持多种类型配置文件（json、yaml、toml和ini等）的配置管理工具，官方文档上说明的很详细，这里也就不再赘述了。
