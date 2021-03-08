@@ -1,5 +1,9 @@
 # Go开发Web应用（4）：Web服务
 
+前言：通过前面的学习，了解了使用的Go来进行Web编程的一些基本知识。如何开发一个有一定规范性的的Web服务仍有很多地方需要改进，比如开发一个REST API，如何处理不同的http方法，数据传输，权限验证和配置等等如何处理呢。
+
+> 本文示例代码已上传至GitHub：[传送门](https://github.com/Xuhy0826/Go-Go-Study/tree/master/lesson34%EF%BC%9AGo%E5%BC%80%E5%8F%91Web%E5%BA%94%E7%94%A8%E5%85%A5%E9%97%A8%EF%BC%884%EF%BC%89Web%E6%9C%8D%E5%8A%A1)
+
 ## 处理Json数据
 
 在与REST Web服务进行交互时，使用最频繁的数据格式应该就是JSON了。前面我们也了解了 [Go如何（反）序列化对象](https://my.oschina.net/xuhy0826/blog/4956986)，通过使用内置的json包便可以实现。除此之外，还可以使用encoding包来实现对json数据的处理，而且encoding包更方便在Web编程中使用，因为它是根据编码器或者解码器来处理**流式数据**。
@@ -141,7 +145,13 @@ func getModel() model.Post {
 
 搭建REST API Service需要为不同的请求路径和请求方式设置不同的处理流程，也就是指定相应的Handler。比如之前开发ASP.NET Core WebApi 使用MVC的模式，框架基本已经帮我们封装路由功能，只需简单配置与标注特性就可以自定义路由规则。在Go中使用`DefaultServerMux`也可以实现最基本的路由功能，当然有很多开源的轮子用起来能更加方便，比如[Gorilla/Mux](https://github.com/gorilla/mux,"Gorilla/Mux")或者 [httprouter](https://github.com/julienschmidt/httprouter)。
 
-接下来简单介绍下基于gorilla/mux来配置路由的方法，首先gorilla/mux的最基本用法如下
+接下来简单介绍下基于gorilla/mux来配置路由的方法，安装直接使用`go get`命令即可，切到自己的工作目录下执行
+
+```bash
+go get -u github.com/gorilla/mux
+```
+
+首先`gorilla/mux`的最基本用法如下
 
 ```go
 package main
@@ -219,5 +229,249 @@ func newList(w http.ResponseWriter, r *http.Request) {
 
 以上简单介绍了`gorilla/mux`中路由的使用，更多的详细说明还是参阅官方文档靠谱。
 
-以上的代码中，所有对路由的配置工作都堆在了main函数中，既不优雅也不利于以后的维护。而比较实用的做法是将各个功能组的路由分到不同的go文件中，在使用同一的配置入口进行注册。就以上面所用到的代码为例，
+以上的代码中，所有对路由的配置工作都堆在了main函数中，既不优雅也不利于以后的维护。而比较实用的做法是将各个功能组的路由分到不同的go文件中，在使用同一的配置入口进行注册。就以上面所用到的代码为例，将所有的``Handler`都分类单独创建go文件保存，并创建一个统一的配置入口来进行路由的配置。
+
+创建一个`/router`的路径，上面的示例代码涉及到帖子（post）和新闻（news）两个分类的服务，再创建`/router/post`与`/router/news`两个路径来分别存放相应的go文件。单独抽出来的文件比如以news.go文件为例，代码如下
+
+1. /router/news/news.go
+
+```go
+package news
+
+import ......
+
+// GetNews 查看新闻
+func GetNews(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r) //获取参数，map类型
+	var newsList []model.News
+
+	allnews := getAllNews() //获取所有 news 集合
+	......
+}
+
+// 读取所有新闻列表
+func getAllNews() []model.News {
+	......
+	
+}
+
+```
+
+这样一来，所有的`Handler`结构就清晰了很多。接下来为创建一个配置的统一入口，为了方便配置，创建一个`Route`类型来设置配置信息。
+
+- /router/router.go
+
+```go
+package router
+
+import (
+	"github.com/gorilla/mux"
+	"net/http"
+)
+
+// Route 路由的配置信息
+type Route struct {
+	Name        string
+	Path        string
+	Method      string
+	HandlerFunc http.HandlerFunc
+}
+
+// 创建Router
+func New(routeCollection ...Route) *mux.Router {
+	router := mux.NewRouter()
+	//router.StrictSlash(true)
+
+	for _, route := range routeCollection {
+		router.Path(route.Path).
+			Name(route.Name).
+			Methods(route.Method).
+			HandlerFunc(route.HandlerFunc)
+	}
+
+	return router
+}
+```
+
+最后，将项目用到的所有路由配置也单独存放于一个go文件中
+
+```go
+package router
+
+import (
+	"lesson34/router/index"
+	"lesson34/router/news"
+	"lesson34/router/post"
+)
+
+var Routes = []Route{
+	{
+		Name:        "index",
+		Path:        "/",
+		Method:      "GET",
+		HandlerFunc: index.Index,
+	},
+	{
+		Name:        "get_post",
+		Path:        "/post",
+		Method:      "GET",
+		HandlerFunc: post.GetPost,
+	},
+	{
+		Name:        "post_post",
+		Path:        "/post",
+		Method:      "POST",
+		HandlerFunc: post.PostPost,
+	},
+	{
+		Name:        "news",
+		Path:        "/news/{title}",
+		Method:      "GET",
+		HandlerFunc: news.GetNews,
+	},
+}
+```
+
+这样一来，在main函数中，我们 只需调用路由的统一配置方法即可，整个项目的结构变得清晰也利于后期的维护管理。
+
+```go
+package main
+
+import (
+	"lesson34/router"
+	"net/http"
+)
+
+func main() {
+	r := router.New(router.Routes...)
+	_ = http.ListenAndServe("localhost:8080", r)
+}
+```
+
+重构好的文件结构会是下面这样，结构清晰。
+
+```bash
+│  go.mod
+│  go.sum
+│  main.go
+├─data
+│      new-list.json
+├─model
+│      Author.go
+│      news.go
+│      post.go
+└─router
+    │  routecfg.go
+    │  router.go
+    ├─index
+    │      index.go
+    ├─news
+    │      news.go
+    └─post
+           post.go
+```
+
+## 中间件
+
+中间件的概念应该都不会陌生，顾名思义，中间件就是在请求处理管道中增加的处理环节。用处很多，比如实现记录日志，身份验证，超时处理等等。在Go中实现一个中间件是很简单的，因为Go处理请求的单元是一个个`Handler`，那么中间件其实也是一个`Handler`。只需要将下一个调用的`Handler`作为参数传入，那么就可以实现了。
+
+比如创建一个记录日志的`Handler`
+
+```go
+package middleware
+
+import (
+	"log"
+	"net/http"
+)
+
+// LoggingMiddleware 日志中间件
+func LoggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		if next == nil {
+			next = http.DefaultServeMux
+		}
+		log.Printf("request from %v", request.RemoteAddr)
+		next.ServeHTTP(writer, request)
+	})
+}
+```
+
+main函数在启动监听时，只需将中间件加上即可。
+
+```go
+package main
+
+import (
+	"lesson34/middleware"
+	"lesson34/router"
+	"net/http"
+)
+
+func main() {
+	r := router.New(router.Routes...)
+	_ = http.ListenAndServe("localhost:8080", middleware.LoggingMiddleware(r))
+}
+```
+
+实现多个中间件只需按照同样的思路进行串联即可。而`gorilla/mux`组件中也包含了中间件功能的封装，使用`r.Use()`函数便可以为全局设置中间件。
+
+```go
+func main() {
+	r := router.New(router.Routes...)
+
+	//使用中间件
+	r.Use(middleware.LoggingMiddleware)
+
+	_ = http.ListenAndServe("localhost:8080", r)
+}
+```
+
+如果有多个中间件的情况，由于`r.Use()`函数的入参是可接受多个参数的，只需按照调用顺序传入各个中间件即可。
+
+比如我们有另外一个中间件`AuthMiddleware`。
+
+```go
+package middleware
+
+import (
+	"net/http"
+)
+
+// AuthMiddleware 授权中间件
+func AuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+
+		authorization := request.Header.Get("Authorization")
+		if authorization != "xuhy" {
+			writer.WriteHeader(http.StatusUnauthorized)
+		}else {
+			next.ServeHTTP(writer, request)
+		}
+	})
+}
+```
+
+在main函数中，使用use函数将两个中间件依次传入
+
+```go
+package main
+
+import (
+	"lesson34/middleware"
+	"lesson34/router"
+	"net/http"
+)
+
+func main() {
+	r := router.New(router.Routes...)
+
+	//调用顺序： logging -> auth -> next
+	r.Use(middleware.LoggingMiddleware, middleware.AuthMiddleware)
+
+	_ = http.ListenAndServe("localhost:8080", r)
+}
+```
+
+
 
