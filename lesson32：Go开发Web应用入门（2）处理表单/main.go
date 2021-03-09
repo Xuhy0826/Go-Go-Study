@@ -2,11 +2,29 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 )
 
 func main() {
+	//获取QueryString
+	http.HandleFunc("/order", func(w http.ResponseWriter, r *http.Request){
+		query := r.URL.Query()
+		//name := query["name"][0]
+		name := query.Get("name")
+		log.Printf("%s\n", name)
+	})
+
+	//获取Body
+	http.HandleFunc("/order/add", func(w http.ResponseWriter, r *http.Request){
+		defer r.Body.Close()
+		body, _ := ioutil.ReadAll(r.Body) //读取Body内容
+		log.Printf("%s\n", body)
+	})
+
+	//处理表单数据
 	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		//*************读取 Form 数据 ：********************
 		// r.ParseForm()
@@ -31,7 +49,7 @@ func main() {
 
 		//*************读取 MultipartForm 数据 ：********************
 		//先解析
-		r.ParseMultipartForm(1024 * 1024)
+		_ = r.ParseMultipartForm(1024 * 1024)
 		// 再试试PostFormValue方法
 		fmt.Fprintln(w, fmt.Sprintf("user name : %v", r.PostFormValue("userName")))
 		fmt.Fprintln(w, fmt.Sprintf("avatar : %v", r.PostFormValue("avatar")))
@@ -42,14 +60,14 @@ func main() {
 			fh := avatar[0]
 			file, err := fh.Open()
 
-			filebuf := make([]byte, fh.Size)
+			fileBuff := make([]byte, fh.Size)
 			if err == nil {
-				_, err := file.Read(filebuf)
+				_, err := file.Read(fileBuff)
 				if err == nil {
 					file, err := os.Create("avatar.jpg")
 					defer file.Close()
 					if err == nil {
-						file.Write(filebuf)
+						file.Write(fileBuff)
 						fmt.Fprintln(w, "avatar : saved")
 					}
 				}
@@ -61,5 +79,5 @@ func main() {
 		//**********************************************
 	})
 
-	http.ListenAndServe("localhost:8080", nil)
+	_ = http.ListenAndServe("localhost:8080", nil)
 }
