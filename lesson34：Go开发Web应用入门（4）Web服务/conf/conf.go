@@ -33,11 +33,10 @@ func init() {
 
 //Init 初始化配置文件
 func Init(filePath string) {
-	_, err := toml.DecodeFile(RealFilePath(filePath), App)
+	_, err := toml.DecodeFile(filePath, App)
 	if err != nil {
-		fmt.Println("Fail to load Configuration file, try again in 1 minute，error:", err)
-		time.Sleep(time.Minute)
+		fmt.Println("Fail to load Configuration file, try again in 10 seconds，error:", err)
+		time.Sleep(time.Second * 10)
 		Init(filePath)
 	}
-
 }

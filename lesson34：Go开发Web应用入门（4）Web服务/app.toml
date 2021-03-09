@@ -1,6 +1,5 @@
 SeHost = "127.0.0.1"
 SePort = "8080"
-
 isDebug = true
 
 [PostgreSqlConf]
@@ -18,4 +17,3 @@ Password = "123456"
 DBHost = "127.0.0.1"
 DBPort = "8902"
 DBName = "test"
-
