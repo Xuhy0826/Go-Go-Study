@@ -1,6 +1,6 @@
 # Go开发Web应用（4）：Web服务
 
-前言：通过前面的学习，了解了使用的Go来进行Web编程的一些基本知识。如何开发一个有一定规范性的Web服务仍有很多地方需要改进，比如开发一个REST API，如何处理不同的http方法，数据传输，权限验证和配置等等如何处理呢。
+前言：通过前面的学习，了解了使用Go来开发Web应用的一些基础知识。但如何开发有一定规范性的Web服务仍有很多地方需要改进，比如针对REST API 如何处理不同的http方法，数据传输，权限验证和配置等等如何处理。
 
 > 本文示例代码已上传至GitHub：[传送门](https://github.com/Xuhy0826/Go-Go-Study/tree/master/lesson34%EF%BC%9AGo%E5%BC%80%E5%8F%91Web%E5%BA%94%E7%94%A8%E5%85%A5%E9%97%A8%EF%BC%884%EF%BC%89Web%E6%9C%8D%E5%8A%A1)
 
