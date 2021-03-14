@@ -32,7 +32,7 @@ _ = http.ListenAndServeTLS("localhost:8080", "cert.pem", "key.pem", nil)
 
 其中`"cert.pem"`和`"key.pem"`分别是证书和秘钥文件（私钥）的路径。如果没有现成的证书，在开发阶段可以使用自签证书来先用。生成自签证书可以使用openssl工具，但是go贴心的为我们提供了现成的方法。
 
-运行``%goroot%\src\crypto\tls\generate_cert.go`文件即可生成证书，打开文件可以看到可用的命令行参数。
+运行`%goroot%\src\crypto\tls\generate_cert.go`文件即可生成证书，打开文件可以看到可用的命令行参数。
 
 ```go
 var (
