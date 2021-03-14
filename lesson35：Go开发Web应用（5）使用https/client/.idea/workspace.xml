@@ -2,15 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1187ede1-10ea-4a2e-9a88-b2c2cc9713fd" name="默认变更列表" comment="">
-      <change afterPath="$PROJECT_DIR$/openssl.cnf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../lesson35：Go开发Web应用（5）Https与gRPC/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../lesson35：Go开发Web应用（5）Https与gRPC/.idea/lesson35：Go开发Web应用（5）Https与gRPC.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../lesson35：Go开发Web应用（5）Https与gRPC/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../lesson35：Go开发Web应用（5）Https与gRPC/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../lesson35：Go开发Web应用（5）Https与gRPC/cert.pem" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../lesson35：Go开发Web应用（5）Https与gRPC/key.pem" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../lesson35：Go开发Web应用（5）Https与gRPC/main.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../lesson35：Go开发Web应用（5）Https与gRPC/note.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../note.md" beforeDir="false" afterPath="$PROJECT_DIR$/../note.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

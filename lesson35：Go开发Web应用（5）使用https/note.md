@@ -57,9 +57,9 @@ wrote key.pem
 
 成功后`"cert.pem"`和`"key.pem"`文件便生成在当前工作目录中。现在启动浏览器通过 https://localhost:8080 进行访问。但是会出现下面的画面，这是由于校验证书失败了，必须忽略这个校验才能得到响应。
 
-<img src="/Users/xuhongyu/workspace/Github/Go-Go-Study/resource/https1.png" alt="访问https" style="zoom:50%;" />
+<img src="https://raw.githubusercontent.com/Xuhy0826/Go-Go-Study/master/resource/https1.png" alt="访问https" style="zoom:50%;" />
 
-同样的，使用postman或者curl方式访问，都会遇到类似的问题，都必须显式的跳过证书验证才能得到信息。那么使用go创建客户端来访问会如何呢？
+同样的，使用postman或者curl方式访问，都会遇到类似的问题，都必须显式的跳过证书验证才能得到信息。那么使用go创建客户端来访问会如何呢？下面是客户端的示例代码。
 
 ```go
 package main
@@ -82,23 +82,89 @@ func main(){
 }
 ```
 
-上面使用`net/http`包的Get方法发起请求，不出意外也是出现了验证的错误。
+上面使用`net/http`包的Get方法发起请求，不出意外也是出现了同样的验证错误。
 
-![go客户端访问](/Users/xuhongyu/workspace/Github/Go-Go-Study/resource/https2.png)
+![go客户端访问](https://raw.githubusercontent.com/Xuhy0826/Go-Go-Study/master/resource/https2.png)
 
 为了显式的跳过验证，客户端代码需要做以下改动
 
 ```go
+package main
 
+import (
+	"io/ioutil"
+	"log"
+	"net/http"
+	"strings"
+)
+
+func main() {
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true, //跳过验证
+			},
+		},
+	}
+	//发起GET请求
+	r, err := client.Get("https://localhost:8080")
+	if err != nil {
+		log.Fatal("error:", err.Error())
+	}
+	defer r.Body.Close()
+	body, err := ioutil.ReadAll(r.Body)
+	log.Println(string(body))
+}
 ```
 
-再次运行，可得到响应了。
+再次运行，现在可以正常得到响应。
 
-![go客户端请求https](/Users/xuhongyu/workspace/Github/Go-Go-Study/resource/https3.png)
+![go客户端请求https](https://raw.githubusercontent.com/Xuhy0826/Go-Go-Study/master/resource/https3.png)
 
-是不是感觉用了个假的https，那么接下来就来解决这个问题。
+必须显式的跳过验证，是不是感觉用了个假的https，那么接下来就来解决这个问题。我们需要在客户端将证书加入到证书池中，如下示例
 
-## 使用自签发证书
+```go
+package main
+
+import (
+	"crypto/tls"
+	"crypto/x509"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"strings"
+)
+
+func main() {
+	//使用证书池，将自己签发的证书加进去
+	pool := x509.NewCertPool()
+	myCaPath := "../cert.pem"
+	caCrt, _ := ioutil.ReadFile(myCaPath)
+	pool.AppendCertsFromPEM(caCrt)
+
+	//创建httpClient，并指定证书池
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs:            pool,
+				InsecureSkipVerify: false, //这次不跳过验证
+			},
+		},
+	}
+	//发起GET请求
+	r, err := client.Get("https://localhost:8080")
+	if err != nil {
+		log.Fatal("error:", err.Error())
+	}
+	defer r.Body.Close()
+	body, err := ioutil.ReadAll(r.Body)
+	log.Println(string(body))
+}
+```
+
+现在再运行客户端，便可以正常得到响应了。除了使用go自带的生成证书的方式，我们也可以使用openssl来生成证书。
+
+## 使用openssl自签发证书
 
 接下来我们需要使用openssl来制作自签证书，Windows安装包版本可以在 [这里](http://slproweb.com/products/Win32OpenSSL.html) 找到对应的安装包进行下载。mac的话自带了openssl，所以就不需要在额外安装了。可以使用`openssl version`检查安装是否成功。
 
@@ -220,7 +286,7 @@ func main() {
 
 现在在执行客户端访问，便可以成功得到结果了。
 
-![客户端访问https](/Users/xuhongyu/workspace/Github/Go-Go-Study/resource/https4.png)
+![客户端访问https](https://raw.githubusercontent.com/Xuhy0826/Go-Go-Study/master/resource/https4.png)
 
 另外，如果是自己有域名的情况下，现在可以在 [Let's Encrypt](https://letsencrypt.org/zh-cn/) 上免费申请证书了。这部分内容我等我的域名备案通过之后再补充上来吧。当然处理直接使用https之外，也可以通过nginx进行反向代理的方式，这种方法就不在本文中讨论了。
 

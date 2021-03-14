@@ -12,7 +12,8 @@ import (
 func main() {
 	//使用证书池，将自己签发的证书加进去
 	pool := x509.NewCertPool()
-	myCaPath := "../cert/ca.crt"
+	//myCaPath := "../cert.pem"
+	myCaPath := "../cert/xuhy.crt"
 	caCrt, _ := ioutil.ReadFile(myCaPath)
 	pool.AppendCertsFromPEM(caCrt)
 
